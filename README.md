@@ -1,4 +1,6 @@
-# note
+# simpleNotes
+
+###hello and welcome to my simple notes
 
 ## Project setup
 ```
