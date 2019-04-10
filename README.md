@@ -1,6 +1,6 @@
 # simpleNotes
 
-###hello and welcome to my simple notes
+### hello and welcome to my simple notes
 
 ## Project setup
 ```
