@@ -28,8 +28,8 @@ export default {
                 },
                 {
                     'id':2,
-                    'title': "shit pants",
-                    'message': "dont that",
+                    'title': "walk",
+                    'message': "dont do that",
                 }
             ]
         }
