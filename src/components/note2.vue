@@ -1,7 +1,7 @@
 <template>
     <div>
-        <input type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote">
-        <input type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote">
+        <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/> <br>
+        <textarea type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote"/>
         <div v-for="(note, index) in notes" :key="note.id">
             <h4>{{note.title}} 
                 <a class="remove-note" @click="removeNote(index)">
@@ -9,13 +9,14 @@
                 </a>
             </h4>
             <p>{{note.message}}</p>
+            <br>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name:'note',
+    name:'note2',
     data() {
         return {
             newNote:'',
@@ -23,12 +24,12 @@ export default {
             notes:[
                 {
                     'id':1,
-                    'title': "groceries",
+                    'title': "whatever",
                     'message': "do that",
                 },
                 {
                     'id':2,
-                    'title': "walk",
+                    'title': "wa231lk",
                     'message': "dont do that",
                 }
             ]
@@ -58,5 +59,9 @@ export default {
 <style lang="scss">
 .remove-note:hover{
     cursor: pointer;
+}
+
+div{
+    width: 100%
 }
 </style>
