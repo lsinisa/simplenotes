@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <h1>Welcome to simpleNotes</h1>
-      <note0/>
-      <note1/>
-      <note2/>
+      <note0 class="notes"/>
+      <note1 class="notes"/>
+      <note2 class="notes"/>
   </div>
 </template>
 
@@ -26,8 +26,8 @@ export default {
   background: #36454f;
   color: #fff;
 }
-  div{
+  .notes{
     display: inline-block;
-    width: 50%;
+    width: 33%;
   }
 </style>
