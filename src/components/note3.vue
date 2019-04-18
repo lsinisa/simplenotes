@@ -1,22 +1,26 @@
 <template>
+  <div>
     <div>
-        <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/> <br>
-        <textarea type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote"/>
-        <div v-for="(note, index) in notes" :key="note.id">
-            <h4>{{note.title}} 
-                <a class="remove-note" @click="removeNote(index)">
-            &times;
-                </a>
-            </h4>
-            <p>{{note.message}}</p>
-            <br>
-        </div>
+      <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/>
+      <br>
+      <textarea type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote"/>
     </div>
+    <div>
+      <div v-for="(note, index) in notes" :key="note.id">
+        <h4>
+          {{note.title}}
+          <a class="remove-note" @click="removeNote(index)">&times;</a>
+        </h4>
+        <p>{{note.message}}</p>
+        <br>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-    name:'note0',
+    name:'note3',
     data() {
         return {
             newNote:'',
@@ -24,13 +28,13 @@ export default {
             notes:[
                 {
                     'id':1,
-                    'title': "groc423423423eries",
-                    'message': "do34234242 that",
+                    'title': "whatever",
+                    'message': "do that",
                 },
                 {
                     'id':2,
-                    'title': "waldfghndfhdgfsk",
-                    'message': "dont ddzsdgfsgfo that",
+                    'title': "wa231lk",
+                    'message': "dont do that",
                 }
             ]
         }
@@ -40,7 +44,7 @@ export default {
             if(this.newNote.trim().length==0 && this.newNoteMSG.trim().length==0){
                 return
             }
-            this.notes0.push({
+            this.notes.push({
                 id: this.idForNote,
                 title: this.newNote,
                 message: this.newNoteMSG,
@@ -57,6 +61,10 @@ export default {
 </script>
 
 <style lang="scss">
+.remove-note{
+    float: right;
+    size: 150%;
+}
 .remove-note:hover{
     cursor: pointer;
 }

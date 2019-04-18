@@ -1,17 +1,21 @@
 <template>
+  <div>
     <div>
-        <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/> <br>
-        <textarea type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote"/>
-        <div v-for="(note, index) in notes" :key="note.id">
-            <h4>{{note.title}} 
-                <a class="remove-note" @click="removeNote(index)">
-            &times;
-                </a>
-            </h4>
-            <p>{{note.message}}</p>
-            <br>
-        </div>
+      <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/>
+      <br>
+      <textarea type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote"/>
     </div>
+    <div>
+      <div v-for="(note, index) in notes" :key="note.id">
+        <h4>
+          {{note.title}}
+          <a class="remove-note" @click="removeNote(index)">&times;</a>
+        </h4>
+        <p>{{note.message}}</p>
+        <br>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -24,12 +28,12 @@ export default {
             notes:[
                 {
                     'id':1,
-                    'title': "whatever",
+                    'title': "groceries",
                     'message': "do that",
                 },
                 {
                     'id':2,
-                    'title': "wa231lk",
+                    'title': "walk",
                     'message': "dont do that",
                 }
             ]
@@ -57,6 +61,10 @@ export default {
 </script>
 
 <style lang="scss">
+.remove-note{
+    float: right;
+    size: 150%;
+}
 .remove-note:hover{
     cursor: pointer;
 }
