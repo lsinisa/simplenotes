@@ -22,7 +22,19 @@ export default {
 
 <style lang="scss">
 *{
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0%;
+  padding: 0%;
   background: #36454f;
   color: #fff;
+}
+
+.notes{
+  margin: 1%;
+}
+
+#app{
+    display:-webkit-inline-box;
+    width: 32%;
 }
 </style>

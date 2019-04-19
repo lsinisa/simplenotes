@@ -61,15 +61,19 @@ export default {
 </script>
 
 <style lang="scss">
+textarea{
+    font-size: 110%;
+    width: 100%;
+    text-decoration: none;
+    border-radius: 3%;
+}
 .remove-note{
     float: right;
     size: 150%;
 }
+
 .remove-note:hover{
     cursor: pointer;
 }
 
-div{
-    width: 100%
-}
 </style>
