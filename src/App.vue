@@ -1,40 +1,45 @@
 <template>
   <div id="app">
-      <note1 class="notes"/>
-      <note2 class="notes"/>
-      <note3 class="notes"/>
+    <img src="./assets/logo.png" alt="Vue.js">
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+      <span v-if="isLoggedIn"> | <a @click="logout">Logout</a></span>
+      <span v-else> |
+        <router-link to="/login">Login</router-link>
+        </span>
+    </div>
+    <router-view/>
   </div>
 </template>
 
+
 <script>
-import note1 from './components/note1'
-import note2 from './components/note2'
-import note3 from './components/note3'
-
+/* eslint-disable */
 export default {
-  name: 'notes',
-  components:{
-    note1,note2,note3
+  computed: {
+    isLoggedIn: function() {
+      return this.$store.getters.isLoggedIn;
+    }
   },
-}
-
+  methods: {
+    logout: function() {
+      this.$store.dispatch("logout").then(() => {
+        this.$router.push("/login");
+      });
+    }
+  }
+};
 </script>
 
-<style lang="scss">
-*{
-  font-family: 'Courier New', Courier, monospace;
-  margin: 0%;
-  padding: 0%;
-  background: #36454f;
-  color: #fff;
+<style>
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
 }
-
-.notes{
-  margin: 1%;
-}
-
-#app{
-    display:-webkit-inline-box;
-    width: 32%;
+a:hover{
+  cursor: pointer;
 }
 </style>
