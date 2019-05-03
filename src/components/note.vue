@@ -55,8 +55,8 @@ export default {
         title: this.newNote,
         message: this.newNoteMsg,
       });
-
       this.newNote = '';
+      this.newNoteMsg = '';
       this.idForNote += 1;
     },
     removeNote(index) {

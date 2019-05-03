@@ -44,8 +44,9 @@ export default {
 
 img{
   float: initial;
-  width: 25%;
+  width: 5%;
   margin: auto;
+  padding: auto;
 }
 
 .logout{
