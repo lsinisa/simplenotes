@@ -1,36 +1,33 @@
   <template>
   <div>
     <form class="login" @submit.prevent="login">
-      <h1>Sign in</h1>
-      <label>Email</label>
-      <input required v-model="email" type="email" placeholder="Name">
-      <label>Password</label>
+      <h3>login</h3>
+      <label>e-mail</label>
+      <input required v-model="email" type="email" placeholder="Name"><br>
+      <label>password</label>
       <input required v-model="password" type="password" placeholder="Password">
-      <hr>
-      <button type="submit">Login</button>
+      <button type="submit">login</button>
     </form>
   </div>
 </template>
 
 <script>
-
-/* eslint-disable*/
 export default {
   data() {
     return {
-      email: "",
-      password: ""
+      email: '',
+      password: '',
     };
   },
   methods: {
-    login: function() {
-      let email = this.email;
-      let password = this.password;
+    login() {
+      const email = this.email;
+      const password = this.password;
       this.$store
-        .dispatch("login", { email, password })
-        .then(() => this.$router.push("/"))
+        .dispatch('login', { email, password })
+        .then(() => this.$router.push('/note'))
         .catch(err => console.log(err));
-    }
-  }
+    },
+  },
 };
 </script>

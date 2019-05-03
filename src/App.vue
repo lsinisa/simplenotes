@@ -1,45 +1,69 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png" alt="Vue.js">
+    <img src="./assets/logo.png">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-      <span v-if="isLoggedIn"> | <a @click="logout">Logout</a></span>
-      <span v-else> |
+      <span v-if="isLoggedIn">
+        <a class="logout" @click="logout">Logout</a>
+      </span>
+      <span v-else>
+        <router-link to="/">Register</router-link> |
         <router-link to="/login">Login</router-link>
-        </span>
+      </span>
     </div>
     <router-view/>
   </div>
 </template>
 
-
 <script>
-/* eslint-disable */
 export default {
   computed: {
-    isLoggedIn: function() {
+    isLoggedIn() {
       return this.$store.getters.isLoggedIn;
-    }
+    },
   },
   methods: {
-    logout: function() {
-      this.$store.dispatch("logout").then(() => {
-        this.$router.push("/login");
+    logout() {
+      this.$store.dispatch('logout').then(() => {
+        this.$router.push('/login');
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style>
+* {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  box-sizing: border-box;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+img{
+  float: initial;
+  width: 25%;
+  margin: auto;
+}
+
+.logout{
+float: right;
+}
+
+.nav{
+  margin: auto;
+}
+
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
-a:hover{
+
+a:hover {
   cursor: pointer;
 }
 </style>

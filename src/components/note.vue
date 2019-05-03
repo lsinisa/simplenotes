@@ -1,19 +1,19 @@
 <template>
   <div>
-    <div>
+    <form action>
       <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/>
       <br>
-      <textarea type="text" placeholder="message" v-model="newNoteMSG" @keyup.enter="addNote"/>
-    </div>
+      <textarea type="text" placeholder="message" v-model="newNoteMsg" @keyup.enter="addNote"/>
+    </form>
     <div>
-      <div v-for="(note, index) in notes" :key="note.id">
-        <h4>
-          {{note.title}}
+      <transition-group :duration="{beforeEnter: 1000, leave: 800}">
+        <div v-for="(note, index) in notes" :key="note.id">
+          <h4>{{note.title}}</h4>
           <a class="remove-note" @click="removeNote(index)">&times;</a>
-        </h4>
-        <p>{{note.message}}</p>
-        <br>
-      </div>
+          <p>{{note.message}}</p>
+          <br>
+        </div>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -23,9 +23,11 @@ export default {
   name: 'note',
   data() {
     return {
+      idForNote: 1,
       newNote: '',
-      idForNote: 3,
+      newNoteMsg: '',
       notes: [
+        /*
         {
           id: 1,
           title: 'groceries',
@@ -36,6 +38,7 @@ export default {
           title: 'walk',
           message: 'dont do that',
         },
+      */
       ],
     };
   },
@@ -50,7 +53,7 @@ export default {
       this.notes.push({
         id: this.idForNote,
         title: this.newNote,
-        message: this.newNoteMSG,
+        message: this.newNoteMsg,
       });
 
       this.newNote = '';
@@ -64,15 +67,21 @@ export default {
 </script>
 
 <style lang="scss">
-.remove-note {
-  float: right;
-  size: 150%;
+textarea {
+  width: 100%;
 }
+.remove-note{
+  float: right;
+}
+
 .remove-note:hover {
   cursor: pointer;
 }
 
-div {
-  width: 100%;
+textarea{
+  font-size: 1em;
+  resize: none;
+  border: 2px solid;
+  border-radius: 3%;
 }
 </style>

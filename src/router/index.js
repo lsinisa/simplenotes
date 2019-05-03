@@ -4,7 +4,6 @@ import Axios from 'axios';
 import note from '../components/note';
 import register from '../components/auth/register';
 import login from '../components/auth/login';
-import resource from '../components/resources/resources';
 
 Vue.use(Router);
 
@@ -19,11 +18,6 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      name: 'note',
-      component: note,
-    },
-    {
-      path: '/register',
       name: 'register',
       component: register,
     },
@@ -33,9 +27,9 @@ const router = new Router({
       component: login,
     },
     {
-      path: '/resorce',
-      name: 'resource',
-      component: resource,
+      path: '/note',
+      name: 'note',
+      component: note,
       meta: {
         requiresAuth: true,
       },
