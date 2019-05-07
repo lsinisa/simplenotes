@@ -3,11 +3,11 @@
     <img src="./assets/logo.png">
     <div id="nav">
       <span v-if="isLoggedIn">
-        <a class="logout" @click="logout">Logout</a>
+        <button class="logout" @click="logout">logout</button>
       </span>
       <span v-else>
-        <router-link to="/">Register</router-link> |
-        <router-link to="/login">Login</router-link>
+        <router-link class="link" to="/">register</router-link>
+        <router-link class="link" to="/login">login</router-link>
       </span>
     </div>
     <router-view/>
@@ -34,34 +34,31 @@ export default {
 <style>
 * {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  box-sizing: border-box;
-  max-width: 600px;
-  margin: 0 auto;
+  background: #F5F5F5;
 }
+
+#app{
+  padding: 1em 1em 1em 0;
+}
+
+.link{
+  text-decoration: none;
+  font-size: 1em;
+  border: 2px solid;
+  border-radius: .3em;
+  padding: .2em;
+}
+
+  .link:hover{
+    cursor: pointer;
+    background: #000;
+    color: #fff;
+  }
 
 img{
-  float: initial;
-  width: 5%;
-  margin: auto;
-  padding: auto;
-}
-
-.logout{
-float: right;
-}
-
-.nav{
-  margin: auto;
-}
-
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  float: right;
+  width: 3em;
 }
 
 a:hover {

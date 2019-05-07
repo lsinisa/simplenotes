@@ -33,7 +33,7 @@ export default new Vuex.Store({
         commit('auth_request');
         axios({ url: 'http://localhost:3000/login', data: user, method: 'POST' })
           .then((resp) => {
-            const token = resp.data.token;
+            const token = resp.data.token; // eslint-disable-next-line
             const user = resp.data.user;
             localStorage.setItem('token', token);
             // Add the following line:
@@ -53,7 +53,7 @@ export default new Vuex.Store({
         commit('auth_request');
         axios({ url: 'http://localhost:3000/register', data: user, method: 'POST' })
           .then((resp) => {
-            const token = resp.data.token;
+            const token = resp.data.token; // eslint-disable-next-line
             const user = resp.data.user;
             localStorage.setItem('token', token);
             // Add the following line:

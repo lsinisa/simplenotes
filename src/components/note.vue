@@ -1,19 +1,18 @@
 <template>
   <div>
+    <h1>simple notes</h1>
     <form action>
       <textarea type="text" placeholder="title" v-model="newNote" @keyup.enter="addNote"/>
       <br>
       <textarea type="text" placeholder="message" v-model="newNoteMsg" @keyup.enter="addNote"/>
     </form>
     <div>
-      <transition-group :duration="{beforeEnter: 1000, leave: 800}">
         <div v-for="(note, index) in notes" :key="note.id">
-          <h4>{{note.title}}</h4>
+          <h4>{{ note.title }}</h4>
           <a class="remove-note" @click="removeNote(index)">&times;</a>
-          <p>{{note.message}}</p>
+          <p>{{ note.message }}</p>
           <br>
         </div>
-      </transition-group>
     </div>
   </div>
 </template>
@@ -27,18 +26,6 @@ export default {
       newNote: '',
       newNoteMsg: '',
       notes: [
-        /*
-        {
-          id: 1,
-          title: 'groceries',
-          message: 'do that',
-        },
-        {
-          id: 2,
-          title: 'walk',
-          message: 'dont do that',
-        },
-      */
       ],
     };
   },
@@ -46,7 +33,7 @@ export default {
     addNote() {
       if (
         this.newNote.trim().length === 0 &&
-        this.newNoteMSG.trim().length === 0
+        this.newNoteMsg.trim().length === 0
       ) {
         return;
       }
@@ -69,19 +56,24 @@ export default {
 <style lang="scss">
 textarea {
   width: 100%;
-}
-.remove-note{
-  float: right;
-}
-
-.remove-note:hover {
-  cursor: pointer;
-}
-
-textarea{
+  margin: auto;
+  padding: auto;
   font-size: 1em;
   resize: none;
   border: 2px solid;
-  border-radius: 3%;
+  border-radius: .3em;
+}
+
+.remove-note{
+  float: right;
+  padding: 2px 5px;
+}
+
+.remove-note:hover {
+  background: #000;
+  border-radius: 1em;
+  color: #fff;
+  cursor: pointer;
+  padding: auto;
 }
 </style>
