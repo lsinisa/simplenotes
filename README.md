@@ -1,6 +1,16 @@
 # simplenotes
 
-> A Vue.js project
+> Vue.js projekat
+
+veb stranica sa sistemom za registraciju, prijavljivanje korisnika i pravljenje beleski
+
+tehnologije koje su koriscene:
+    *`vue.js`
+    *`vuex`
+    *`vue-router`
+    *`axios`
+    *`sass`
+    *`eslint`
 
 ## Build Setup
 
