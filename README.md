@@ -5,12 +5,14 @@
 veb stranica sa sistemom za registraciju, prijavljivanje korisnika i pravljenje beleski
 
 tehnologije koje su koriscene:
-    *`vue.js`
-    *`vuex`
-    *`vue-router`
-    *`axios`
-    *`sass`
-    *`eslint`
+<ul>
+    <li>`vue.js`</li>
+    <li>`vuex`</li>
+    <li>`vue-router`</li>
+    <li>`axios`</li>
+    <li>`sass`</li>
+    <li>`eslint`</li>
+</ul>
 
 ## Build Setup
 
