@@ -2,8 +2,6 @@
 
 > Vue.js projekat
 
-veb stranica sa sistemom za registraciju, prijavljivanje korisnika i pravljenje beleski
-
 tehnologije koje su koriscene:
 <ul>
     <li>`vue.js`</li>
