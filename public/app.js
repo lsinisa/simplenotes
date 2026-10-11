@@ -20,6 +20,22 @@ function fieldValue(id) {
   return element ? element.value : '';
 }
 
+// Short, scannable age for a note card: "just now", "12m", "3h", "2d", then
+// the plain date once it is more than a week old.
+function timeLabel(iso) {
+  if (!iso) return '';
+  const then = Date.parse(iso);
+  if (!Number.isFinite(then)) return '';
+  const minutes = Math.round((Date.now() - then) / 60000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return minutes + 'm';
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return hours + 'h';
+  const days = Math.round(hours / 24);
+  if (days < 7) return days + 'd';
+  return iso.slice(0, 10);
+}
+
 // Same-origin requests: no CORS preflight, no absolute localhost URLs.
 function api(method, url, body) {
   const headers = { 'Content-Type': 'application/json' };
@@ -33,53 +49,89 @@ function api(method, url, body) {
     .catch(() => [0, { error: 'could not reach the server' }]);
 }
 
-function status(text) {
+function status(text, kind) {
   statusLine.textContent = text;
+  if (kind) statusLine.setAttribute('data-kind', kind);
+  else statusLine.removeAttribute('data-kind');
+}
+
+// The logo is 512x512 but is drawn at 2.75rem; the intrinsic size keeps the
+// layout stable before the stylesheet has been parsed.
+function topbar(buttons) {
+  return `
+    <header class="topbar">
+      <img class="logo" src="/assets/logo.png" alt="simpleNotes logo" width="512" height="512">
+      <h1 class="wordmark">simple notes</h1>
+      <nav id="nav" class="actions" aria-label="account actions">${buttons}</nav>
+    </header>`;
 }
 
 function guestHtml() {
+  const actions = `
+    <button class="link" data-action="register">register</button>
+    <button class="link" data-action="login">login</button>`;
   return `
-    <img class="logo" src="/assets/logo.png">
-    <h1>simple notes</h1>
-    <div id="nav">
-      <button class="link" data-action="register">register</button>
-      <button class="link" data-action="login">login</button>
-    </div>
+    ${topbar(actions)}
     <p class="lede">register or sign in to see your notes - everything is stored on this little server.</p>
     <form id="auth-form">
-      <input id="f-name" type="text" placeholder="name">
-      <input id="f-email" type="email" placeholder="e-mail">
-      <input id="f-password" type="password" placeholder="password">
+      <div class="field">
+        <label for="f-name">name</label>
+        <input id="f-name" type="text" placeholder="what should we call you">
+      </div>
+      <div class="field">
+        <label for="f-email">e-mail</label>
+        <input id="f-email" type="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="f-password">password</label>
+        <input id="f-password" type="password" placeholder="at least one character">
+      </div>
     </form>`;
 }
 
+// A note is one card: title + age on the left, delete button on the right,
+// message underneath. Nothing floats any more, the grid does the placement.
+function noteCard(note) {
+  const title = String(note.title || '').trim();
+  const titleText = title ? esc(title) : '<span class="untitled">untitled</span>';
+  const created = String(note.created_at || '');
+  const age = timeLabel(created);
+  const time = age ? `<time datetime="${esc(created)}">${esc(age)}</time>` : '';
+  return `
+    <article class="note">
+      <div class="note-head">
+        <h2 class="note-title">${titleText}</h2>
+        ${time}
+        <button class="remove-note" data-action="delete" data-id="${note.id}" aria-label="delete this note">delete</button>
+      </div>
+      <p class="note-body">${esc(note.message || '')}</p>
+    </article>`;
+}
+
 function editorHtml() {
-  const notes = store.notes.map((note) => `
-    <div class="note">
-      <h4>${esc(note.title || 'untitled')}</h4>
-      <button class="remove-note" data-action="delete" data-id="${note.id}" aria-label="remove this note">&times;</button>
-      <p>${esc(note.message)}</p>
-    </div>`).join('');
+  const actions = '<button class="link" data-action="logout">logout</button>';
+  const cards = store.notes.map(noteCard).join('');
   const who = store.user && store.user.name ? esc(store.user.name) : 'you';
   const count = store.notes.length;
   const summary = count === 0
     ? '<p class="empty">no notes yet - write a title and a message, then press enter to save.</p>'
     : `<p class="count">${count} note${count === 1 ? '' : 's'} saved</p>`;
   return `
-    <img class="logo" src="/assets/logo.png">
-    <h1>simple notes</h1>
+    ${topbar(actions)}
     <p class="who">signed in as <strong>${who}</strong></p>
-    <div id="nav">
-      <button class="link" data-action="logout">logout</button>
-    </div>
-    <div class="composer">
-      <span class="hint">title</span>
-      <textarea id="t-title" class="title"></textarea>
-      <span class="hint">message</span>
-      <textarea id="t-msg" class="message"></textarea>
-      <span class="hint">press enter to save the note</span>
-    </div>
-    <div id="notes">${summary}${notes}</div>`;
+    <section class="composer" aria-label="write a note">
+      <div class="field field-title">
+        <label for="t-title">title</label>
+        <textarea id="t-title" class="title"></textarea>
+      </div>
+      <div class="field field-msg">
+        <label for="t-msg">message</label>
+        <textarea id="t-msg" class="message"></textarea>
+      </div>
+      <p class="hint">press enter to save the note</p>
+    </section>
+    ${summary}
+    <div id="notes">${cards}</div>`;
 }
 
 function paint() {
@@ -114,7 +166,7 @@ function boot() {
     }
     store.token = '';
     localStorage.removeItem('token');
-    status('your session expired, please register again');
+    status('your session expired, please register again', 'error');
     return paint();
   });
 }
@@ -125,23 +177,23 @@ function doRegister() {
     email: fieldValue('f-email'),
     password: fieldValue('f-password'),
   };
-  if (!data.email || !data.password) return status('fill in the e-mail and the password');
+  if (!data.email || !data.password) return status('fill in the e-mail and the password', 'error');
   status('saving...');
   api('POST', '/api/register', data).then((result) => {
     const [code, resp] = result;
     if (code === 200) return accept(resp);
-    status(resp.error || 'register failed');
+    status(resp.error || 'register failed', 'error');
   });
 }
 
 function doLogin() {
   const data = { email: fieldValue('f-email'), password: fieldValue('f-password') };
-  if (!data.email || !data.password) return status('fill in the e-mail and the password');
+  if (!data.email || !data.password) return status('fill in the e-mail and the password', 'error');
   status('checking...');
   api('POST', '/api/login', data).then((result) => {
     const [code, resp] = result;
     if (code === 200) return accept(resp);
-    status(resp.error || 'login failed');
+    status(resp.error || 'login failed', 'error');
   });
 }
 
@@ -151,7 +203,7 @@ function doLogout() {
   store.notes = [];
   store.mode = 'guest';
   localStorage.removeItem('token');
-  status('logged out');
+  status('logged out', 'ok');
   return paint();
 }
 
@@ -160,7 +212,7 @@ function doDelete(id) {
   api('DELETE', '/api/notes/' + encodeURIComponent(id)).then((result) => {
     const [code, resp] = result;
     if (code === 200) return loadNotes();
-    status(resp.error || 'delete failed');
+    status(resp.error || 'delete failed', 'error');
   });
 }
 
@@ -182,7 +234,7 @@ function saveNote() {
       clearComposer();
       return loadNotes();
     }
-    status(resp.error || 'could not save the note');
+    status(resp.error || 'could not save the note', 'error');
   });
 }
 
@@ -201,8 +253,12 @@ root.addEventListener('click', (event) => {
 });
 
 // Enter submits the note, matching the original app's @keyup.enter behaviour.
+// If the keyboard is parked on a button we let the browser activate that
+// button instead, so tabbing to "logout" or "delete" still works.
 document.addEventListener('keydown', (event) => {
   if (store.mode !== 'editor' || event.key !== 'Enter') return;
+  const focus = event.target;
+  if (focus && focus.closest('[data-action]')) return;
   event.preventDefault();
   saveNote();
 });

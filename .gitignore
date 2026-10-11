@@ -10,8 +10,9 @@ yarn-error.log*
 sqlitedb
 data/
 
-# captured server stdout while testing locally
+# captured server stdout/stderr while testing locally
 server.out
+server.err
 
 # Editor directories and files
 .idea

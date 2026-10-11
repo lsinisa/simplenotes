@@ -19,6 +19,22 @@ page, one stylesheet and one script that talk to a small JSON API.
 
 Requires **Node 22+** (`node:sqlite` is built in from Node 22.5; developed on Node 26).
 
+## Interface
+
+The client styling is one stylesheet with design tokens at the top (`--paper`,
+`--ink`, `--accent`, spacing, radii, shadows), so the whole look is retuned from
+one place:
+
+- light and dark themes come from `prefers-color-scheme` - no script, no inline
+  styles (the CSP only allows same-origin `style-src` anyway)
+- guest view is a join card, editor view is a composer card plus a responsive
+  grid of note cards that reflows down to one column on phones
+- note cards show their age (`just now`, `12m`, `3h`, `2d`) and an explicit
+  delete button instead of a floating `x`
+- keyboard first: `enter` while typing saves the note, `enter` on a focused
+  button activates that button
+- `prefers-reduced-motion` turns the hover transitions off
+
 ## Running
 
 ```bash

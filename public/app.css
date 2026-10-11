@@ -1,174 +1,528 @@
+/* =============================================================
+   simpleNotes - one hand written stylesheet, no frameworks.
+   Colours, spacing and radii are tokens so the whole look can be
+   retuned from the top of this file; the dark theme only has to
+   restate the colour tokens.
+   ============================================================= */
+
 :root {
-  --ink: #2c3e50;
-  --ink-soft: #66727d;
-  --ink-faint: #97a0a8;
-  --paper: #f5f5f5;
-  --card: #fff;
-  --line: #ccd3d9;
+  /* type */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* spacing scale */
+  --s-1: .25rem;
+  --s-2: .5rem;
+  --s-3: .75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2.25rem;
+  --s-7: 3rem;
+
+  /* shape */
+  --radius-sm: .375rem;
+  --radius-md: .75rem;
+  --radius-lg: 1rem;
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(15, 23, 20, .06), 0 3px 10px rgba(15, 23, 20, .05);
+  --shadow-2: 0 2px 4px rgba(15, 23, 20, .09), 0 12px 26px rgba(15, 23, 20, .08);
+  --motion: 150ms;
+
+  /* light theme - the accent green is pulled from the logo mark */
+  --paper: #f4f6f3;
+  --surface: #ffffff;
+  --surface-2: #ecefec;
+  --line: #d6dcd6;
+  --line-strong: #b6c1b8;
+  --ink: #16201b;
+  --ink-soft: #49594e;
+  --ink-faint: #667669;
+  --accent: #0b7a3a;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3f2e7;
+  --danger: #a02a2c;
+  --danger-soft: #fbe9e7;
 }
 
-* {
-  font-family: "Avenir", "Avenir Next", Helvetica, Arial, sans-serif;
-  color: var(--ink);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101512;
+    --surface: #171e1a;
+    --surface-2: #1e2621;
+    --line: #2b352e;
+    --line-strong: #3d4a41;
+    --ink: #e7ece7;
+    --ink-soft: #aebbb1;
+    --ink-faint: #7e8c82;
+    --accent: #4ed489;
+    --accent-ink: #071409;
+    --accent-soft: #17331f;
+    --danger: #ef8b88;
+    --danger-soft: #3b1f1e;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, .5), 0 4px 12px rgba(0, 0, 0, .4);
+    --shadow-2: 0 2px 5px rgba(0, 0, 0, .55), 0 14px 28px rgba(0, 0, 0, .45);
+  }
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
+html {
+  font-size: calc(13px + 0.35vw);
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink);
   background: var(--paper);
+  background-image: radial-gradient(110% 55% at 50% -8%, var(--accent-soft), transparent 62%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  min-height: 100vh;
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
 }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------- app shell ---------------------------- */
 
 #app {
-  padding: 1em 1em 1em 0;
-  max-width: 44em;
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+  width: min(62rem, 100%);
+  margin: 0 auto;
+  padding: var(--s-5) var(--s-6) var(--s-6);
 }
 
-h1 {
-  font-size: 1.6em;
-  font-weight: 300;
-  margin: 0 0 .2em;
+.topbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .logo {
-  float: right;
-  width: 3em;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0 var(--s-3) 0 0;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
 }
 
-.lede {
-  font-size: .9em;
-  color: var(--ink-soft);
-  margin: .2em 0 .6em;
+h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.2;
 }
 
-.who {
-  font-size: .9em;
-  color: var(--ink-soft);
-  margin: .2em 0;
-}
-
-.who strong {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.count,
-.empty {
-  font-size: .85em;
-  color: var(--ink-faint);
-  margin: .4em 0;
+/* action buttons live in the header so they never stack under the copy */
+#nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-left: auto;
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
   font: inherit;
-  font-size: 1em;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .01em;
   color: var(--ink);
-  background: var(--card);
-  text-decoration: none;
-  border: 2px solid var(--ink);
-  border-radius: .3em;
-  padding: .2em .6em;
-  margin: .2em 0;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  min-height: 2.1rem;
+  padding: var(--s-1) var(--s-4);
   cursor: pointer;
+  transition: background var(--motion) ease, color var(--motion) ease,
+    border-color var(--motion) ease, box-shadow var(--motion) ease;
 }
 
 .link:hover {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-1);
 }
 
-.link:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
+.link:active {
+  transform: translateY(1px);
+}
+
+/* --------------------------- text fields --------------------------- */
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: var(--s-1);
+}
+
+.field label {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
 input,
 textarea {
   font: inherit;
-  font-size: 1em;
+  font-size: .95rem;
+  line-height: 1.45;
   color: var(--ink);
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: .3em;
-  margin: .2em 0;
-  padding: .2em .4em;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--s-2) var(--s-3);
   width: 100%;
+  min-height: 2rem;
   resize: none;
+  caret-color: var(--accent);
+  transition: border-color var(--motion) ease, box-shadow var(--motion) ease;
 }
 
-textarea {
-  min-height: 1.6em;
+input:hover,
+textarea:hover {
+  border-color: var(--accent);
 }
 
 input:focus,
 textarea:focus {
-  border-color: var(--ink);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+textarea.title {
+  min-height: 1.9rem;
+}
+
+textarea.message {
+  min-height: 5.5rem;
+}
+
+textarea {
+  white-space: pre-wrap;
+}
+
+/* --------------------------- composer card --------------------------- */
+
+.composer {
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  max-width: 34rem;
+  padding: var(--s-4) var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
 }
 
 .hint {
-  font-size: .8em;
+  font-size: .8rem;
   color: var(--ink-soft);
-  display: block;
-  margin: .2em 0;
+  margin: 0;
 }
 
-.composer {
-  margin: .6em 0;
+/* wide screens get a two column composer: title left, message right */
+@media (min-width: 58rem) {
+  .composer {
+    max-width: 48rem;
+    grid-template-columns: 17rem 1fr;
+    grid-template-areas:
+      "title message"
+      "hint hint";
+  }
+
+  .composer .field-title {
+    grid-area: title;
+  }
+
+  .composer .field-msg {
+    grid-area: message;
+  }
+
+  .composer .hint {
+    grid-area: hint;
+    justify-self: start;
+  }
+}
+
+/* ---------------------------- join card ---------------------------- */
+
+#auth-form {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+  max-width: 44rem;
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+@media (min-width: 44rem) {
+  #auth-form {
+    grid-template-columns: repeat(3, minmax(11rem, 1fr));
+  }
+}
+
+.lede {
+  max-width: 40rem;
+  font-size: .95rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ------------------------- signed in status chip ------------------------- */
+
+.who {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: .82rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: var(--s-1) var(--s-3);
+}
+
+.who::before {
+  content: "";
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: var(--s-2);
+}
+
+.who strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ------------------------------ note grid ------------------------------ */
+
+#notes {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 }
 
 .note {
-  background: var(--card);
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: .3em;
-  padding: .5em .8em;
-  margin: .4em 0;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow var(--motion) ease, transform var(--motion) ease,
+    border-color var(--motion) ease;
 }
 
-.note h4 {
-  font-size: 1em;
+.note:hover {
+  box-shadow: var(--shadow-2);
+  border-color: var(--line-strong);
+  transform: translateY(-2px);
+}
+
+.note-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+}
+
+.note-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+}
+
+.untitled {
+  color: var(--ink-faint);
+  font-style: italic;
   font-weight: 500;
-  margin: .2em 0;
 }
 
-.note p {
-  margin: .2em 0;
+time {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-body {
+  margin: 0;
+  font-size: .95rem;
+  color: var(--ink-soft);
   white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-body:empty {
+  display: none;
 }
 
 .remove-note {
   font: inherit;
-  float: right;
-  border: 0;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--ink-faint);
   background: transparent;
-  color: var(--ink-soft);
-  padding: 2px 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  min-height: 1.8rem;
+  padding: var(--s-1) var(--s-3);
+  margin-left: auto;
   cursor: pointer;
+  transition: color var(--motion) ease, background var(--motion) ease,
+    border-color var(--motion) ease;
 }
 
 .remove-note:hover {
-  background: var(--ink);
-  border-radius: 1em;
-  color: var(--paper);
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger);
 }
+
+.remove-note:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 2px;
+}
+
+/* --------------------- count chip / empty state --------------------- */
+
+.count {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: var(--s-1) var(--s-3);
+}
+
+.empty {
+  justify-self: start;
+  max-width: 26rem;
+  font-size: .85rem;
+  color: var(--ink-soft);
+  background: var(--surface-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  padding: var(--s-3) var(--s-4);
+}
+
+/* ------------------------------ status line ------------------------------ */
 
 .status {
-  font-size: .9em;
+  margin: var(--s-4) auto 0;
+  max-width: 40rem;
+  font-size: .85rem;
+  line-height: 1.45;
   color: var(--ink-soft);
-  padding: .4em;
-  min-height: 1em;
 }
 
-@media (max-width: 600px) {
-  h1 {
-    font-size: 1.3em;
+.status:not(:empty) {
+  padding: var(--s-2) var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-1);
+}
+
+.status[data-kind="error"] {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+.status[data-kind="ok"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* ------------------------------ small screens ------------------------------ */
+
+@media (max-width: 32rem) {
+  #app {
+    padding: var(--s-4) var(--s-4) var(--s-5);
   }
 
   .logo {
-    width: 2.4em;
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  h1 {
+    font-size: 1.15rem;
+  }
+
+  .composer,
+  #auth-form {
+    max-width: 100%;
+  }
+
+  #notes {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------ motion off ------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+
+  .note:hover {
+    transform: none;
   }
 }
 
