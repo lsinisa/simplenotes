@@ -1,0 +1,174 @@
+:root {
+  --ink: #2c3e50;
+  --ink-soft: #66727d;
+  --ink-faint: #97a0a8;
+  --paper: #f5f5f5;
+  --card: #fff;
+  --line: #ccd3d9;
+}
+
+* {
+  font-family: "Avenir", "Avenir Next", Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--paper);
+}
+
+body {
+  min-height: 100vh;
+}
+
+#app {
+  padding: 1em 1em 1em 0;
+  max-width: 44em;
+}
+
+h1 {
+  font-size: 1.6em;
+  font-weight: 300;
+  margin: 0 0 .2em;
+}
+
+.logo {
+  float: right;
+  width: 3em;
+}
+
+.lede {
+  font-size: .9em;
+  color: var(--ink-soft);
+  margin: .2em 0 .6em;
+}
+
+.who {
+  font-size: .9em;
+  color: var(--ink-soft);
+  margin: .2em 0;
+}
+
+.who strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.count,
+.empty {
+  font-size: .85em;
+  color: var(--ink-faint);
+  margin: .4em 0;
+}
+
+.link {
+  font: inherit;
+  font-size: 1em;
+  color: var(--ink);
+  background: var(--card);
+  text-decoration: none;
+  border: 2px solid var(--ink);
+  border-radius: .3em;
+  padding: .2em .6em;
+  margin: .2em 0;
+  cursor: pointer;
+}
+
+.link:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+input,
+textarea {
+  font: inherit;
+  font-size: 1em;
+  color: var(--ink);
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: .3em;
+  margin: .2em 0;
+  padding: .2em .4em;
+  width: 100%;
+  resize: none;
+}
+
+textarea {
+  min-height: 1.6em;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--ink);
+}
+
+.hint {
+  font-size: .8em;
+  color: var(--ink-soft);
+  display: block;
+  margin: .2em 0;
+}
+
+.composer {
+  margin: .6em 0;
+}
+
+.note {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: .3em;
+  padding: .5em .8em;
+  margin: .4em 0;
+}
+
+.note h4 {
+  font-size: 1em;
+  font-weight: 500;
+  margin: .2em 0;
+}
+
+.note p {
+  margin: .2em 0;
+  white-space: pre-wrap;
+}
+
+.remove-note {
+  font: inherit;
+  float: right;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+.remove-note:hover {
+  background: var(--ink);
+  border-radius: 1em;
+  color: var(--paper);
+}
+
+.status {
+  font-size: .9em;
+  color: var(--ink-soft);
+  padding: .4em;
+  min-height: 1em;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.3em;
+  }
+
+  .logo {
+    width: 2.4em;
+  }
+}
+

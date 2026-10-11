@@ -6,6 +6,13 @@ yarn-debug.log*
 yarn-error.log*
 /test/unit/coverage/
 
+# local sqlite state - never commit a database
+sqlitedb
+data/
+
+# captured server stdout while testing locally
+server.out
+
 # Editor directories and files
 .idea
 .vscode
