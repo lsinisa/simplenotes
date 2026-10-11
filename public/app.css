@@ -34,15 +34,18 @@
   --surface: #ffffff;
   --surface-2: #ecefec;
   --line: #d6dcd6;
-  --line-strong: #b6c1b8;
   --ink: #16201b;
   --ink-soft: #49594e;
   --ink-faint: #667669;
   --accent: #0b7a3a;
   --accent-ink: #ffffff;
-  --accent-soft: #e3f2e7;
   --danger: #a02a2c;
-  --danger-soft: #fbe9e7;
+
+  /* tints and the stronger rule are mixed out of the tokens above, so a theme
+     only has to state the base colours */
+  --line-strong: color-mix(in oklab, var(--line), var(--ink) 18%);
+  --accent-soft: color-mix(in oklab, var(--surface), var(--accent) 12%);
+  --danger-soft: color-mix(in oklab, var(--surface), var(--danger) 8%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,15 +54,12 @@
     --surface: #171e1a;
     --surface-2: #1e2621;
     --line: #2b352e;
-    --line-strong: #3d4a41;
     --ink: #e7ece7;
     --ink-soft: #aebbb1;
     --ink-faint: #7e8c82;
     --accent: #4ed489;
     --accent-ink: #071409;
-    --accent-soft: #17331f;
     --danger: #ef8b88;
-    --danger-soft: #3b1f1e;
     --shadow-1: 0 1px 2px rgba(0, 0, 0, .5), 0 4px 12px rgba(0, 0, 0, .4);
     --shadow-2: 0 2px 5px rgba(0, 0, 0, .55), 0 14px 28px rgba(0, 0, 0, .45);
   }
@@ -133,6 +133,7 @@ h1 {
   font-weight: 700;
   letter-spacing: -.02em;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
 /* action buttons live in the header so they never stack under the copy */
@@ -395,7 +396,8 @@ time {
   font-size: .95rem;
   color: var(--ink-soft);
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
 }
 
 .note-body:empty {

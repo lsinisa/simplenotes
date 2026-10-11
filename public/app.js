@@ -37,13 +37,16 @@ function timeLabel(iso) {
 }
 
 // Same-origin requests: no CORS preflight, no absolute localhost URLs.
+// The abort signal means a server that is not there fails fast instead of
+// leaving the page waiting for the browser's own timeout.
 function api(method, url, body) {
   const headers = { 'Content-Type': 'application/json' };
-  if (store.token) headers.Authorization = 'Bearer ' + store.token;
+  if (store.token) headers.Authorization = `Bearer ${store.token}`;
   return fetch(url, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
+    signal: AbortSignal.timeout(8000),
   })
     .then((res) => res.json().then((data) => [res.status, data]))
     .catch(() => [0, { error: 'could not reach the server' }]);
@@ -171,29 +174,17 @@ function boot() {
   });
 }
 
-function doRegister() {
-  const data = {
-    name: fieldValue('f-name'),
-    email: fieldValue('f-email'),
-    password: fieldValue('f-password'),
-  };
-  if (!data.email || !data.password) return status('fill in the e-mail and the password', 'error');
-  status('saving...');
-  api('POST', '/api/register', data).then((result) => {
-    const [code, resp] = result;
-    if (code === 200) return accept(resp);
-    status(resp.error || 'register failed', 'error');
-  });
-}
-
-function doLogin() {
+// register and login differ only by the endpoint and the name field, so one
+// submit covers both.
+function doAuth(kind) {
   const data = { email: fieldValue('f-email'), password: fieldValue('f-password') };
+  if (kind === 'register') data.name = fieldValue('f-name');
   if (!data.email || !data.password) return status('fill in the e-mail and the password', 'error');
-  status('checking...');
-  api('POST', '/api/login', data).then((result) => {
+  status(kind === 'register' ? 'saving...' : 'checking...');
+  api('POST', `/api/${kind}`, data).then((result) => {
     const [code, resp] = result;
     if (code === 200) return accept(resp);
-    status(resp.error || 'login failed', 'error');
+    status(resp.error || `${kind} failed`, 'error');
   });
 }
 
@@ -239,8 +230,7 @@ function saveNote() {
 }
 
 function action(name, id) {
-  if (name === 'register') return doRegister();
-  if (name === 'login') return doLogin();
+  if (name === 'register' || name === 'login') return doAuth(name);
   if (name === 'logout') return doLogout();
   if (name === 'delete') return doDelete(id);
 }

@@ -27,6 +27,9 @@ one place:
 
 - light and dark themes come from `prefers-color-scheme` - no script, no inline
   styles (the CSP only allows same-origin `style-src` anyway)
+- the tints (`--accent-soft`, `--danger-soft`) and the stronger rule are mixed
+  out of the base colours with `color-mix()`, so each theme only states the
+  base colours
 - guest view is a join card, editor view is a composer card plus a responsive
   grid of note cards that reflows down to one column on phones
 - note cards show their age (`just now`, `12m`, `3h`, `2d`) and an explicit

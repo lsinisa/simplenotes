@@ -37,40 +37,34 @@ function verifyPassword(password, stored) {
 }
 
 /* ------------------------------ tokens ------------------------------ */
-function hmacB64url(data) {
-  return crypto.createHmac('sha256', config.secret)
-    .update(data)
-    .digest('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+// Buffer's own base64url codec does the padding and the alphabet swap that the
+// old build spelled out by hand. The hmac stays raw bytes so a token check
+// compares the signature itself, never its text form.
+function hmac(data) {
+  return crypto.createHmac('sha256', config.secret).update(data).digest();
 }
 
 function b64url(value) {
-  return Buffer.from(value)
-    .toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+  return Buffer.from(value).toString('base64url');
 }
 
 function fromB64url(value) {
-  return Buffer.from(value.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+  return Buffer.from(value, 'base64url');
 }
 
 function signToken(payload) {
   const now = Math.floor(Date.now() / 1000);
   const head = b64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const body = b64url(JSON.stringify({ ...payload, iat: now, exp: now + config.tokenExpiresIn }));
-  const sig = hmacB64url(`${head}.${body}`);
+  const sig = hmac(`${head}.${body}`).toString('base64url');
   return `${head}.${body}.${sig}`;
 }
 
 function verifyToken(token) {
   const parts = String(token).split('.');
   if (parts.length !== 3) return null;
-  const expected = Buffer.from(hmacB64url(`${parts[0]}.${parts[1]}`), 'utf8');
-  const given = Buffer.from(parts[2], 'utf8');
+  const expected = hmac(`${parts[0]}.${parts[1]}`);
+  const given = Buffer.from(parts[2], 'base64url');
   if (expected.length !== given.length || !crypto.timingSafeEqual(expected, given)) return null;
   let payload;
   try {
@@ -249,12 +243,19 @@ async function deleteNote(req, res, id) {
   sendJson(res, 200, { ok: true });
 }
 
+// One lookup instead of six comparisons per request; the delete route is the
+// only one that carries a path parameter, so it stays a prefix check.
+const ENDPOINTS = {
+  'POST /api/register': register,
+  'POST /api/login': login,
+  'GET /api/me': me,
+  'GET /api/notes': listNotes,
+  'POST /api/notes': createNote,
+};
+
 function api(method, pathname, req, res) {
-  if (method === 'POST' && pathname === '/api/register') return register(req, res);
-  if (method === 'POST' && pathname === '/api/login') return login(req, res);
-  if (method === 'GET' && pathname === '/api/me') return me(req, res);
-  if (method === 'GET' && pathname === '/api/notes') return listNotes(req, res);
-  if (method === 'POST' && pathname === '/api/notes') return createNote(req, res);
+  const handler = ENDPOINTS[`${method} ${pathname}`];
+  if (handler) return handler(req, res);
   if (method === 'DELETE' && pathname.startsWith('/api/notes/')) return deleteNote(req, res, pathname.slice(11));
   return null;
 }
