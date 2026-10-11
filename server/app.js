@@ -9,6 +9,9 @@ const zlib = require('node:zlib');
 const config = require('./config');
 const Db = require('./db');
 
+// The db file lives in a gitignored data/ directory that is not in the repo,
+// so a fresh clone has nowhere to open it in - create the directory first.
+fs.mkdirSync(path.dirname(config.dbPath), { recursive: true });
 const db = new Db(config.dbPath);
 
 /* ---------------------------- passwords ---------------------------- */
@@ -72,7 +75,10 @@ function verifyToken(token) {
   } catch (e) {
     return null;
   }
-  if (!payload || !payload.id || (payload.exp && payload.exp < Math.floor(Date.now() / 1000))) return null;
+  // The id goes straight into a sqlite parameter, so it has to be a real
+  // integer before anything else is trusted about the payload.
+  if (!payload || !Number.isSafeInteger(payload.id)) return null;
+  if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
   return payload;
 }
 
@@ -127,6 +133,9 @@ function sendJson(res, status, value) {
   const body = Buffer.from(JSON.stringify(value));
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  // Notes change at any time, so an API response must never be cached.
+  res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Length', body.length);
   res.end(body);
 }
@@ -138,6 +147,7 @@ function sendText(res, status, message) {
 function notFound(res) {
   res.statusCode = 404;
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   res.end('Not found');
 }
 
@@ -154,35 +164,51 @@ function safeUser(user) {
 const EMAIL_RE = /^[A-Za-z0-9._%+-]{3,64}@[A-Za-z0-9.-]{2,64}$/;
 const MAX_NOTES_PER_USER = 500;
 
-function readBody(req) {
+// The 413 has to be written before the request is hung up: destroying the
+// socket first is what made the client see a closed connection instead of a
+// status. So readBody takes the response and answers at the limit itself.
+function readBody(req, res) {
   const chunks = [];
   let total = 0;
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     req.on('data', (chunk) => {
       total += chunk.length;
       if (total > config.maxBodyBytes) {
-        reject(new Error('Request body too large'));
+        sendText(res, 413, 'Request body too large');
         req.destroy();
         return;
       }
       chunks.push(chunk);
     });
     req.on('end', () => resolve(Buffer.concat(chunks)));
-    req.on('error', reject);
+    req.on('error', (err) => resolve(Buffer.concat(chunks)));
   });
 }
 
-function parseBody(req) {
-  return readBody(req).then((buffer) => {
+// A malformed body is a client error, not a server crash: the status travels
+// on the error so the route handler answers 400 instead of a generic 500.
+function parseBody(req, res) {
+  return readBody(req, res).then((buffer) => {
     if (!buffer.length) return {};
-    const parsed = JSON.parse(buffer.toString());
-    if (typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Expected a JSON object');
+    let parsed;
+    try {
+      parsed = JSON.parse(buffer.toString());
+    } catch (err) {
+      const bad = new Error(`Expected a JSON object, got: ${String(err.message || err)}`);
+      bad.status = 400;
+      throw bad;
+    }
+    if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+      const bad = new Error('Expected a JSON object');
+      bad.status = 400;
+      throw bad;
+    }
     return parsed;
   });
 }
 
 function register(req, res) {
-  return parseBody(req).then((body) => {
+  return parseBody(req, res).then((body) => {
     const name = String(body.name || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
     const password = String(body.password || '');
@@ -196,7 +222,7 @@ function register(req, res) {
 }
 
 function login(req, res) {
-  return parseBody(req).then((body) => {
+  return parseBody(req, res).then((body) => {
     const email = String(body.email || '').trim().toLowerCase();
     const password = String(body.password || '');
     const user = db.selectByEmail(email);
@@ -226,7 +252,7 @@ async function listNotes(req, res) {
 async function createNote(req, res) {
   const user = bearer(req);
   if (!user) return sendText(res, 401, 'Login required');
-  return parseBody(req).then((body) => {
+  return parseBody(req, res).then((body) => {
     const title = String(body.title || '').trim().slice(0, 200);
     const message = String(body.message || '').trim().slice(0, 4000);
     if (!title && !message) return sendText(res, 400, 'A note needs a title or a message');
@@ -239,6 +265,9 @@ async function createNote(req, res) {
 async function deleteNote(req, res, id) {
   const user = bearer(req);
   if (!user) return sendText(res, 401, 'Login required');
+  // Number('anything') is NaN, which the sqlite binding rejects - answer 400
+  // for a path like /api/notes/hello instead of crashing the handler.
+  if (!/^\d+$/.test(id)) return sendText(res, 400, 'Note id must be a number');
   db.deleteNote(user.id, Number(id));
   sendJson(res, 200, { ok: true });
 }
@@ -268,10 +297,13 @@ function sendAsset(res, asset, req) {
     res.end();
     return;
   }
-  const useGzip = asset.gz && /gzip/i.test(req.headers['accept-encoding'] || '');
+  // A HEAD request gets the headers of the resource but no body.
+  const head = req.method === 'HEAD';
+  const useGzip = !head && asset.gz && /gzip/i.test(req.headers['accept-encoding'] || '');
   const body = useGzip ? asset.gz : asset.buffer;
   res.statusCode = 200;
   res.setHeader('Content-Type', asset.type);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Content-Length', body.length);
   res.setHeader('ETag', asset.etag);
   res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
@@ -279,7 +311,7 @@ function sendAsset(res, asset, req) {
     res.setHeader('Content-Security-Policy', "default-src 'self'; style-src 'self'; script-src 'self'");
   }
   if (useGzip) res.setHeader('Content-Encoding', 'gzip');
-  res.end(body);
+  res.end(head ? '' : body);
 }
 
 function route(req, res) {
@@ -287,7 +319,9 @@ function route(req, res) {
   try {
     const promise = api(req.method, pathname, req, res);
     if (promise) {
-      promise.catch((err) => sendText(res, 500, String(err.message || err)));
+      // Handlers tag client errors with the status they mean; anything else is
+      // a genuine server fault.
+      promise.catch((err) => sendText(res, err.status || 500, String(err.message || err)));
       return;
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') return notFound(res);
@@ -301,8 +335,12 @@ function route(req, res) {
 
 const server = http.createServer(route);
 
+// The callback gets a raw socket - there is no handshake property on it, so the
+// old check never fired and a malformed request left a live connection behind.
+// Answer 400 and hang up.
 server.on('clientError', (err, socket) => {
-  if (socket.handshake) socket.close();
+  if (socket.writable) socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  socket.destroy();
 });
 
 server.listen(config.port, config.host, () => {

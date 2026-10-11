@@ -10,14 +10,7 @@
     "smoke": "node test/smoke.mjs",
     "live": "node test/live.mjs"
   },
-  "dependencies": {},
-  "devDependencies": {},
   "engines": {
     "node": ">= 22.0.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  }
 }

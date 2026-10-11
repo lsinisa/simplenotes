@@ -41,7 +41,7 @@ class Db {
         'INSERT INTO notes (user_id,title,message,created_at) VALUES (:user_id,:title,:message,:created_at)'
       ),
       deleteNote: this.db.prepare('DELETE FROM notes WHERE user_id = :user_id AND id = :id'),
-      countNotes: this.db.prepare('SELECT id FROM notes WHERE user_id = :user_id'),
+      countNotes: this.db.prepare('SELECT COUNT(id) AS count FROM notes WHERE user_id = :user_id'),
     };
   }
 
@@ -63,7 +63,10 @@ class Db {
   }
 
   countNotes(userId) {
-    return this.stmt.countNotes.all({ user_id: userId }).length;
+    // COUNT always returns one row, so a single .get replaces pulling every
+    // note into memory just to take its length.
+    const row = this.stmt.countNotes.get({ user_id: userId });
+    return row ? row.count : 0;
   }
 
   insertNote(userId, title, message, createdAt) {

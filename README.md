@@ -73,6 +73,10 @@ All endpoints are `application/json`. Everything except `register`/`login` needs
 | `POST` | `/api/notes` | `{ title, message }` -> `201` |
 | `DELETE` | `/api/notes/:id` | deletes one note |
 
+Bad input is a `400` (malformed JSON, a non-numeric note id), a body over 8 KB
+is a `413`, and every API response carries `Cache-Control: no-store` plus
+`X-Content-Type-Options: nosniff`.
+
 Passwords are stored as `scrypt$cost$blockSize$parallelization$<salt>$<hash>`
 (`node:crypto` scrypt, per-user random salt). The stored hash is **never** sent
 back to the client: every user row is passed through `safeUser()` before it is
