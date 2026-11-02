@@ -28,9 +28,13 @@ one place:
 - light and dark themes follow `prefers-color-scheme`, and a `theme` chip cycles
   auto/light/dark explicitly (stored on the page as `data-theme` on `<html>`,
   remembered between visits)
-- guest view is two join cards split by intent - the log-in card carries only
-  e-mail and password, the register card adds the name - so a stray click
-  cannot mix the flows
+- guest view is two join cards paired side by side on wide screens (log-in
+  card without name, register card adding it), stacking to one column on
+  phones
+- editor view reads top-down as one intuitive column: who you are, the
+  centred composer, the status chip under it, one toolbar row (search field
+  and search/sort chips on the left, the note count on the right) directly
+  above the note grid
 - note cards show their age (`just now`, `12m`, `3h`, `2d`) and two chips:
   `edit` loads the note back into the composer, and saving then updates that
   note in place (its age stays); `delete` is two-step - the first click arms

@@ -119,6 +119,7 @@ function guestHtml() {
     ${topbar(actions)}
     <p class="lede">register or sign in to see your notes - everything is stored on this little server.</p>
     ${statusChip()}
+    <section class="join">
     <form id="auth-login">
       <div class="field">
         <label for="f-login-email">e-mail</label>
@@ -144,7 +145,8 @@ function guestHtml() {
         <input id="f-reg-password" type="password" placeholder="at least one character">
       </div>
       <button class="link" data-action="register">register</button>
-    </form>`;
+    </form>
+    </section>`;
 }
 
 // A note is one card: title + age on the left, delete/edit chips on the
@@ -236,8 +238,8 @@ function editorHtml() {
       </div>
       <button class="link" data-action="search" aria-label="search or clear search">${store.query ? 'clear search' : 'search'}</button>
       <button class="link" data-action="sort" aria-label="cycle note order">${`sort: ${store.sort}`}</button>
+      ${summary}
     </div>
-    ${summary}
     <div id="notes">${cards}</div>`;
 }
 

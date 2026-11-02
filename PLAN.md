@@ -43,6 +43,19 @@ Status markers: [ ] todo  [x] done and smoke-checked
 - [x] 4b. Guest form split into two cards by intent (log-in card has no
       name field; register card adds it).
 
+## Tranche 3 - layout re-arrangement (client-only, live "layout is awful" ask)
+
+- [x] 16. Composer centred as the page's focus column under the who chip
+      (justify-self center; status chip already centred -> same centre line).
+- [x] 17. Search/sort chips + count chip merged into ONE toolbar row
+      directly above the note list (actions left, current state right);
+      summary moved inside the filters div in the template.
+- [x] 18. Guest join cards paired side-by-side on >=52rem via a .join grid
+      (stack in one column on narrow screens; margin-top hack dropped).
+- verification: geometry asserted live (:3150) - composer centre gap 0px,
+  toolbar left-to-right order proven by bounding rects, join cards same row
+  with 2 grid tracks, notes grid computed 3 tracks at 1264px viewport.
+
 ## Verification trail
 
 - `node --check public/app.js` after each client edit; `node --check` on

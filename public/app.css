@@ -249,7 +249,9 @@ textarea {
 
 /* --------------------------- composer card --------------------------- */
 
+/* the composer is the page's focus: centred column under the who chip */
 .composer {
+  justify-self: center;
   display: grid;
   align-content: start;
   gap: var(--s-3);
@@ -299,8 +301,24 @@ textarea {
 
 /* ---------------------------- join card ---------------------------- */
 
+/* the two join cards read as a pair side by side on wide screens and stack
+   into one column on narrow ones */
+.join {
+  justify-self: center;
+  display: grid;
+  gap: var(--s-4);
+  max-width: 58rem;
+}
+
+@media (min-width: 52rem) {
+  .join {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 #auth-login,
 #auth-register {
+  justify-self: center;
   display: grid;
   align-content: start;
   gap: var(--s-4);
@@ -310,10 +328,6 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
-}
-
-#auth-register {
-  margin-top: var(--s-3);
 }
 
 .lede {
@@ -326,7 +340,7 @@ textarea {
 /* ------------------------- signed in status chip ------------------------- */
 
 .who {
-  justify-self: start;
+  justify-self: center;
   display: flex;
   align-items: center;
   gap: var(--s-2);
@@ -455,16 +469,20 @@ time {
   box-shadow: 0 0 0 2px var(--danger-soft);
 }
 
-/* the filters row sits under the status chip: search field plus the search
-   and sort chips, one wrapped flex line, centred like the other rows */
+/* one toolbar line directly above the note list: what you can do to the
+   list (search, sort) on the left, the current state (count) on the right */
 .filters {
-  justify-self: center;
+  justify-self: stretch;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
-  gap: var(--s-2) var(--s-3);
-  max-width: 34rem;
+  gap: var(--s-2) var(--s-4);
+}
+
+.filters .count,
+.filters .empty {
+  margin-left: auto;
 }
 
 .field-search {
