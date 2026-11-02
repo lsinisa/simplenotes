@@ -78,8 +78,8 @@ function guestHtml() {
     <p class="lede">register or sign in to see your notes - everything is stored on this little server.</p>
     <form id="auth-form">
       <div class="field">
-        <label for="f-name">name</label>
-        <input id="f-name" type="text" placeholder="what should we call you">
+        <label for="f-name">name (register only)</label>
+        <input id="f-name" type="text" placeholder="used only to register">
       </div>
       <div class="field">
         <label for="f-email">e-mail</label>
@@ -105,7 +105,7 @@ function noteCard(note) {
       <div class="note-head">
         <h2 class="note-title">${titleText}</h2>
         ${time}
-        <button class="remove-note" data-action="delete" data-id="${note.id}" aria-label="delete this note">delete</button>
+        <button class="remove-note" data-action="delete" data-id="${note.id}" aria-label="${title ? `delete note ${titleText}` : 'delete untitled note'}">delete</button>
       </div>
       <p class="note-body">${esc(note.message || '')}</p>
     </article>`;
@@ -131,7 +131,8 @@ function editorHtml() {
         <label for="t-msg">message</label>
         <textarea id="t-msg" class="message"></textarea>
       </div>
-      <p class="hint">press enter to save the note</p>
+      <p class="hint">press enter over the fields to save the note, esc clears the draft</p>
+      <button class="link save" data-action="save">save note</button>
     </section>
     ${summary}
     <div id="notes">${cards}</div>`;
@@ -233,6 +234,7 @@ function action(name, id) {
   if (name === 'register' || name === 'login') return doAuth(name);
   if (name === 'logout') return doLogout();
   if (name === 'delete') return doDelete(id);
+  if (name === 'save') return saveNote();
 }
 
 // One delegated listener instead of one listener per button.
@@ -242,15 +244,39 @@ root.addEventListener('click', (event) => {
   action(target.dataset.action, target.dataset.id);
 });
 
-// Enter submits the note, matching the original app's @keyup.enter behaviour.
-// If the keyboard is parked on a button we let the browser activate that
-// button instead, so tabbing to "logout" or "delete" still works.
+// Enter works only while the keyboard sits on a composer field, so a stray
+// Enter elsewhere on the page can no longer post a note; Esc throws the draft
+// away. Enter on a focused button still activates it via the browser.
 document.addEventListener('keydown', (event) => {
-  if (store.mode !== 'editor' || event.key !== 'Enter') return;
+  if (store.mode !== 'editor') return;
   const focus = event.target;
-  if (focus && focus.closest('[data-action]')) return;
-  event.preventDefault();
-  saveNote();
+  const composer = focus && (focus.id === 't-title' || focus.id === 't-msg');
+  if (event.key === 'Enter') {
+    if (!composer) return;
+    event.preventDefault();
+    return saveNote();
+  }
+  if (event.key === 'Escape') {
+    if (!composer) return;
+    event.preventDefault();
+    clearComposer();
+    return status('draft cleared', 'ok');
+  }
+});
+
+// A textarea does not grow on its own: with resize:none anything past
+// min-height is invisible and unscrollable, so every keystroke re-measures
+// by collapsing the box and reading the wrapped content height back.
+function growTextarea(field) {
+  const min = parseFloat(getComputedStyle(field).minHeight) || 0;
+  field.style.height = '1px';
+  const need = field.scrollHeight;
+  field.style.height = `${Math.ceil(Math.max(need, min))}px`;
+}
+
+root.addEventListener('input', (event) => {
+  const target = event.target;
+  if (target && (target.id === 't-title' || target.id === 't-msg')) growTextarea(target);
 });
 
 boot();

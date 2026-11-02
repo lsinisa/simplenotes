@@ -36,7 +36,7 @@
   --line: #d6dcd6;
   --ink: #16201b;
   --ink-soft: #49594e;
-  --ink-faint: #667669;
+  --ink-faint: #506056;
   --accent: #0b7a3a;
   --accent-ink: #ffffff;
   --danger: #a02a2c;
@@ -56,7 +56,7 @@
     --line: #2b352e;
     --ink: #e7ece7;
     --ink-soft: #aebbb1;
-    --ink-faint: #7e8c82;
+    --ink-faint: #94a298;
     --accent: #4ed489;
     --accent-ink: #071409;
     --danger: #ef8b88;
@@ -255,28 +255,34 @@ textarea {
   margin: 0;
 }
 
-/* wide screens get a two column composer: title left, message right */
+/* wide screens get a two column composer: title left, message right,
+   save button under the message */
 @media (min-width: 58rem) {
-  .composer {
-    max-width: 48rem;
-    grid-template-columns: 17rem 1fr;
-    grid-template-areas:
-      "title message"
-      "hint hint";
-  }
+.composer {
+  max-width: 48rem;
+  grid-template-columns: 17rem 1fr;
+  grid-template-areas:
+    "title message"
+    "hint save";
+}
 
-  .composer .field-title {
-    grid-area: title;
-  }
+.composer .field-title {
+  grid-area: title;
+}
 
-  .composer .field-msg {
-    grid-area: message;
-  }
+.composer .field-msg {
+  grid-area: message;
+}
 
-  .composer .hint {
-    grid-area: hint;
-    justify-self: start;
-  }
+.composer .hint {
+  grid-area: hint;
+  justify-self: start;
+}
+
+.composer .save {
+  grid-area: save;
+  justify-self: end;
+}
 }
 
 /* ---------------------------- join card ---------------------------- */
@@ -285,18 +291,12 @@ textarea {
   display: grid;
   align-content: start;
   gap: var(--s-4);
-  max-width: 44rem;
+  max-width: 28rem;
   padding: var(--s-5);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
-}
-
-@media (min-width: 44rem) {
-  #auth-form {
-    grid-template-columns: repeat(3, minmax(11rem, 1fr));
-  }
 }
 
 .lede {
