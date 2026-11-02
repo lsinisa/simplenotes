@@ -167,10 +167,12 @@ function noteCard(note) {
       <div class="note-head">
         <h2 class="note-title">${titleText}</h2>
         ${time}
+      </div>
+      <p class="note-body">${esc(note.message || '')}</p>
+      <div class="note-actions">
         <button class="link" data-action="edit" data-id="${note.id}" aria-label="edit this note">edit</button>
         <button class="${removeClass}" data-action="delete" data-id="${note.id}" aria-label="${armed ? 'confirm deleting this note' : title ? `delete note ${titleText}` : 'delete untitled note'}">${removeLabel}</button>
       </div>
-      <p class="note-body">${esc(note.message || '')}</p>
     </article>`;
 }
 
@@ -217,33 +219,38 @@ function editorHtml() {
   }
   return `
     ${topbar(actions)}
-    <p class="who">signed in as <strong>${who}</strong></p>
-    <section class="composer" aria-label="write a note">
-      <div class="field field-title">
-        <label for="t-title">title</label>
-        <textarea id="t-title" class="title">${esc(editing ? editing.title : '')}</textarea>
+    <div class="feed">
+      <div class="toolbar">
+        <div class="field field-search">
+          <label for="f-search">search</label>
+          <input id="f-search" spellcheck="false" value="${esc(store.query)}">
+        </div>
+        <button class="link" data-action="search" aria-label="search or clear search">${store.query ? 'clear search' : 'search'}</button>
+        <button class="link" data-action="sort" aria-label="cycle note order">${`sort: ${store.sort}`}</button>
+        ${summary}
       </div>
-      <div class="field field-msg">
-        <label for="t-msg">message</label>
-        <textarea id="t-msg" class="message">${esc(editing ? editing.message : '')}</textarea>
-      </div>
-      <p class="hint">${esc(hint)}</p>
-      <button class="link save" data-action="save">${esc(saveLabel)}</button>
-    </section>
-    ${statusChip()}
-    <div class="filters">
-      <div class="field field-search">
-        <label for="f-search">search</label>
-        <input id="f-search" spellcheck="false" value="${esc(store.query)}">
-      </div>
-      <button class="link" data-action="search" aria-label="search or clear search">${store.query ? 'clear search' : 'search'}</button>
-      <button class="link" data-action="sort" aria-label="cycle note order">${`sort: ${store.sort}`}</button>
-      ${summary}
+      <div id="notes">${cards}</div>
     </div>
-    <div id="notes">${cards}</div>`;
+    <section class="rail">
+      <p class="who">signed in as <strong>${who}</strong></p>
+      <section class="composer" aria-label="write a note">
+        <div class="field field-title">
+          <label for="t-title">title</label>
+          <textarea id="t-title" class="title">${esc(editing ? editing.title : '')}</textarea>
+        </div>
+        <div class="field field-msg">
+          <label for="t-msg">message</label>
+          <textarea id="t-msg" class="message">${esc(editing ? editing.message : '')}</textarea>
+        </div>
+        <p class="hint">${esc(hint)}</p>
+        <button class="link save" data-action="save">${esc(saveLabel)}</button>
+        ${statusChip()}
+      </section>
+    </section>`;
 }
 
 function paint() {
+  root.dataset.mode = store.mode;
   root.innerHTML = store.mode === 'editor' ? editorHtml() : guestHtml();
 }
 

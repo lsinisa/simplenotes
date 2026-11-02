@@ -56,6 +56,42 @@ Status markers: [ ] todo  [x] done and smoke-checked
   toolbar left-to-right order proven by bounding rects, join cards same row
   with 2 grid tracks, notes grid computed 3 tracks at 1264px viewport.
 
+## Tranche 4 - full layout rework (measured on live :3150, 1264px viewport)
+
+Diagnosis (measured, not eyeballed):
+- notes render as a 3-column mosaic: cards 322px wide, body text 268px
+  (~42 chars/line) and two notes share one row (cardTops [538,538]) - a
+  reading list read in a Z pattern is wrong; feeds read in one column
+- composer island 567px centred above a 1002px-wide notes grid: no visual
+  relationship between the focus box and the list
+- empty status row costs ~52px of dead band (35px gap + 17px gap around a
+  0px-tall element) - every page has a useless band under the composer
+- toolbar stretches 1002px while its content is ~half that: long empty rail,
+  count chip floats alone far from the controls
+- guest join cards are 277x343 - mostly void padding (login card has 2 fields
+  but stretches to the register card's 343px)
+- page content 1080px inside a 1264px viewport: nothing caps reading width
+
+Plan:
+- [x] 19. Two-pane page frame: at >=60rem editor view, #app becomes
+        "head head" / "feed rail" (measured tracks 470px + 401px at 1264px
+        viewport); data-mode stamped by paint() so guest stays one column
+- [x] 20. Single-column note feed: cardWidths [470,470], cardTops [234,503]
+        strictly increasing, body 416px (~65-75 chars/line)
+- [x] 21. Card anatomy: note-actions row below the body (actionsRowBelowBody
+        verified true), time chip right-aligned in the head row
+- [x] 22. Toolbar rides the feed width (toolbarW == feedW == 470) directly
+        above the list, count chip pushed to the list's right edge
+- [x] 23. Status inside the composer card as its last row: statusParent
+        "composer", height 0 when empty - no dead band anywhere
+- [x] 24. Guest: ONE join card (width min(34rem,100%)), login section 205px
+        + register section 307px stacked with hairline; no twin-card void
+- [x] 25. Topbar slimmed: logo 2.25rem (1.9rem on phones), wordmark 1.15rem
+- verification for the tranche: geometry asserts live (single feed column,
+  cardTops strictly increasing, rail/feed pane widths from computed
+  gridTemplateColumns of #app, status height 0 -> composer height unchanged
+  when empty), plus one screenshot handed to the user for their own eyes.
+
 ## Verification trail
 
 - `node --check public/app.js` after each client edit; `node --check` on

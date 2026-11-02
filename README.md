@@ -28,13 +28,13 @@ one place:
 - light and dark themes follow `prefers-color-scheme`, and a `theme` chip cycles
   auto/light/dark explicitly (stored on the page as `data-theme` on `<html>`,
   remembered between visits)
-- guest view is two join cards paired side by side on wide screens (log-in
-  card without name, register card adding it), stacking to one column on
-  phones
-- editor view reads top-down as one intuitive column: who you are, the
-  centred composer, the status chip under it, one toolbar row (search field
-  and search/sort chips on the left, the note count on the right) directly
-  above the note grid
+- guest view is one join card: log in above a hairline, register below it,
+  each intent with its own fields and button, card height fits its content
+- editor view splits into two panes on wide screens: the note feed owns the
+  left (toolbar - search field + search/sort chips left, note count right -
+  riding directly above a single-column list at reading width), a rail on
+  the right carries the who chip and the composer card with the live status
+  chip as a row inside it; on phones it stacks feed-first
 - note cards show their age (`just now`, `12m`, `3h`, `2d`) and two chips:
   `edit` loads the note back into the composer, and saving then updates that
   note in place (its age stays); `delete` is two-step - the first click arms

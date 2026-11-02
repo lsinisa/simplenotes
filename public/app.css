@@ -119,9 +119,51 @@ body {
   display: grid;
   align-content: start;
   gap: var(--s-4);
-  width: min(62rem, 100%);
+  width: min(56rem, 100%);
   margin: 0 auto;
   padding: var(--s-5) var(--s-6) var(--s-6);
+}
+
+/* wide screens split the page into two panes: the note feed owns the left,
+   the writing rail (who + composer + status) sits opposite on the right;
+   data-mode is stamped by paint() in app.js so the guest view stays one
+   calm column */
+@media (min-width: 60rem) {
+  #app[data-mode="editor"] {
+    grid-template-columns: 1fr 23rem;
+    grid-template-areas:
+      "head head"
+      "feed rail";
+    column-gap: var(--s-5);
+    row-gap: var(--s-4);
+  }
+
+  .topbar {
+    grid-area: head;
+  }
+
+  .feed {
+    grid-area: feed;
+  }
+
+  .rail {
+    grid-area: rail;
+    justify-self: end;
+  }
+}
+
+.feed {
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  max-width: 31rem;
+}
+
+.rail {
+  display: grid;
+  align-content: start;
+  gap: var(--s-3);
+  max-width: 24rem;
 }
 
 .topbar {
@@ -134,8 +176,8 @@ body {
 }
 
 .logo {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
   margin: 0 var(--s-3) 0 0;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-1);
@@ -143,7 +185,7 @@ body {
 
 h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -.02em;
   line-height: 1.2;
@@ -249,7 +291,7 @@ textarea {
 
 /* --------------------------- composer card --------------------------- */
 
-/* the composer is the page's focus: centred column under the who chip */
+/* the composer stacks in the rail: title above message above hint/save/status */
 .composer {
   justify-self: center;
   display: grid;
@@ -263,71 +305,51 @@ textarea {
   box-shadow: var(--shadow-1);
 }
 
+.composer .save {
+  justify-self: end;
+}
+
+/* the chip is a row of the composer card: when it is empty it is 0 tall and
+   costs no band anywhere on the page; it always sits under the save chip */
+.composer .status {
+  margin: 0 auto;
+  justify-self: center;
+}
+
 .hint {
   font-size: .8rem;
   color: var(--ink-soft);
   margin: 0;
 }
 
-/* wide screens get a two column composer: title left, message right,
-   save button under the message */
-@media (min-width: 58rem) {
-.composer {
-  max-width: 48rem;
-  grid-template-columns: 17rem 1fr;
-  grid-template-areas:
-    "title message"
-    "hint save";
-}
-
-.composer .field-title {
-  grid-area: title;
-}
-
-.composer .field-msg {
-  grid-area: message;
-}
-
-.composer .hint {
-  grid-area: hint;
-  justify-self: start;
-}
-
-.composer .save {
-  grid-area: save;
-  justify-self: end;
-}
-}
 
 /* ---------------------------- join card ---------------------------- */
 
-/* the two join cards read as a pair side by side on wide screens and stack
-   into one column on narrow ones */
+/* one centred card for both intents: log-in above the hairline, register
+   below it, each with its own button - the card height is the content's */
 .join {
-  justify-self: center;
-  display: grid;
-  gap: var(--s-4);
-  max-width: 58rem;
-}
-
-@media (min-width: 52rem) {
-  .join {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-#auth-login,
-#auth-register {
   justify-self: center;
   display: grid;
   align-content: start;
   gap: var(--s-4);
-  max-width: 28rem;
-  padding: var(--s-5);
+  width: min(34rem, 100%);
+  padding: var(--s-5) var(--s-5);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
+}
+
+#auth-login,
+#auth-register {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+}
+
+#auth-register {
+  border-top: 1px solid var(--line);
+  padding-top: var(--s-4);
 }
 
 .lede {
@@ -366,13 +388,12 @@ textarea {
   font-weight: 700;
 }
 
-/* ------------------------------ note grid ------------------------------ */
-
+/* one reading column: the feed is the list, cards stack top to bottom */
 #notes {
   display: grid;
   align-content: start;
   gap: var(--s-4);
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .note {
@@ -394,7 +415,7 @@ textarea {
 
 .note-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   flex-wrap: wrap;
   gap: var(--s-1) var(--s-3);
 }
@@ -418,6 +439,7 @@ time {
   font-size: .72rem;
   color: var(--ink-faint);
   font-variant-numeric: tabular-nums;
+  margin-left: auto;
 }
 
 .note-body {
@@ -433,6 +455,13 @@ time {
   display: none;
 }
 
+/* action chips live at the card's bottom right, not in the header row */
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s-2);
+}
+
 .remove-note {
   font: inherit;
   font-size: .74rem;
@@ -444,7 +473,6 @@ time {
   border-radius: var(--radius-md);
   min-height: 1.8rem;
   padding: var(--s-1) var(--s-3);
-  margin-left: auto;
   cursor: pointer;
   transition: color var(--motion) ease, background var(--motion) ease,
     border-color var(--motion) ease;
@@ -469,10 +497,9 @@ time {
   box-shadow: 0 0 0 2px var(--danger-soft);
 }
 
-/* one toolbar line directly above the note list: what you can do to the
-   list (search, sort) on the left, the current state (count) on the right */
-.filters {
-  justify-self: stretch;
+/* the toolbar rides the feed's width directly above the list: controls left,
+   count chip right */
+.toolbar {
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
@@ -480,8 +507,8 @@ time {
   gap: var(--s-2) var(--s-4);
 }
 
-.filters .count,
-.filters .empty {
+.toolbar .count,
+.toolbar .empty {
   margin-left: auto;
 }
 
@@ -561,22 +588,17 @@ time {
   }
 
   .logo {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 1.9rem;
+    height: 1.9rem;
   }
 
   h1 {
-    font-size: 1.15rem;
+    font-size: 1rem;
   }
 
   .composer,
-  #auth-login,
-  #auth-register {
+  .join {
     max-width: 100%;
-  }
-
-  #notes {
-    grid-template-columns: 1fr;
   }
 }
 
