@@ -40,6 +40,9 @@ class Db {
       insertNote: this.db.prepare(
         'INSERT INTO notes (user_id,title,message,created_at) VALUES (:user_id,:title,:message,:created_at)'
       ),
+      updateNote: this.db.prepare(
+        'UPDATE notes SET title = :title, message = :message WHERE user_id = :user_id AND id = :id'
+      ),
       deleteNote: this.db.prepare('DELETE FROM notes WHERE user_id = :user_id AND id = :id'),
       countNotes: this.db.prepare('SELECT COUNT(id) AS count FROM notes WHERE user_id = :user_id'),
     };
@@ -71,6 +74,28 @@ class Db {
 
   insertNote(userId, title, message, createdAt) {
     this.stmt.insertNote.run({ user_id: userId, title, message, created_at: createdAt });
+  }
+
+  // PATCH merges: a missing field keeps the stored value, an empty string
+  // clears it. The row is read through the prepared byId-style lookup for
+  // notes so the handler can 404 before touching it.
+  selectNote(userId, id) {
+    if (!this.noteById) {
+      this.noteById = this.db.prepare('SELECT * FROM notes WHERE user_id = :user_id AND id = :id');
+    }
+    return this.noteById.get({ user_id: userId, id });
+  }
+
+  updateNote(userId, id, title, message) {
+    const current = this.selectNote(userId, id);
+    if (!current) return false;
+    this.stmt.updateNote.run({
+      user_id: userId,
+      id,
+      title: title === undefined ? current.title : title,
+      message: message === undefined ? current.message : message,
+    });
+    return true;
   }
 
   deleteNote(userId, id) {

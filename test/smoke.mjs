@@ -86,6 +86,11 @@ async function run() {
   expect('invalid email rejected', badEmail === 400, `${badEmail} ${JSON.stringify(badEmailBody)}`);
 
   const target = list.notes[0].id;
+  const [patchStatus, patchBody] = await call('PATCH', `/api/notes/${target}`, { title: 'edited' }, token);
+  expect('patch edit accepted', patchStatus === 200, `${patchStatus} ${JSON.stringify(patchBody)}`);
+  const [, afterPatch] = await call('GET', '/api/notes', undefined, token);
+  expect('patch keeps other field', afterPatch.notes.some((n) => n.title === 'edited' && n.message === 'world'), JSON.stringify(afterPatch));
+
   const [delStatus, delBody] = await call('DELETE', `/api/notes/${target}`, undefined, token);
   expect('delete note accepted', delStatus === 200, `${delStatus} ${JSON.stringify(delBody)}`);
 

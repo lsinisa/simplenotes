@@ -25,19 +25,25 @@ The client styling is one stylesheet with design tokens at the top (`--paper`,
 `--ink`, `--accent`, spacing, radii, shadows), so the whole look is retuned from
 one place:
 
-- light and dark themes come from `prefers-color-scheme` - no script, no inline
-  styles (the CSP only allows same-origin `style-src` anyway)
-- the tints (`--accent-soft`, `--danger-soft`) and the stronger rule are mixed
-  out of the base colours with `color-mix()`, so each theme only states the
-  base colours
-- guest view is a join card, editor view is a composer card plus a responsive
-  grid of note cards that reflows down to one column on phones
-- note cards show their age (`just now`, `12m`, `3h`, `2d`) and an explicit
-  delete button instead of a floating `x`
+- light and dark themes follow `prefers-color-scheme`, and a `theme` chip cycles
+  auto/light/dark explicitly (stored on the page as `data-theme` on `<html>`,
+  remembered between visits)
+- guest view is two join cards split by intent - the log-in card carries only
+  e-mail and password, the register card adds the name - so a stray click
+  cannot mix the flows
+- note cards show their age (`just now`, `12m`, `3h`, `2d`) and two chips:
+  `edit` loads the note back into the composer, and saving then updates that
+  note in place (its age stays); `delete` is two-step - the first click arms
+  the card (red outline, "confirm delete"), a second click on the same card
+  removes it
+- a search field plus `search` and `sort` chips filter/order the note list
+  client-side (sort cycles newest/oldest/A-Z); the saved data still round-trips
+  whole
 - keyboard first: `enter` on a composer field saves the note, `esc` throws the
-  draft away, `enter` on a focused button activates that button
-- the `saving...` chip clears itself on every repaint once the round-trip
-  finishes, so no toast lingers after a save
+  draft away (or cancels an open edit), `enter` on a focused button activates
+  that button
+- the status chip sits just under the composer and clears itself on every
+  repaint once the round-trip finishes, so no toast lingers after a save
 - palette is restrained slate neutrals + one blue accent; flat paper, whisper-thin
   shadows, rounded-rect controls (chips stay pill-shaped)
 - `prefers-reduced-motion` turns the hover transitions off
@@ -75,6 +81,7 @@ All endpoints are `application/json`. Everything except `register`/`login` needs
 | `GET` | `/api/me` | the signed-in user |
 | `GET` | `/api/notes` | the user's notes, newest first |
 | `POST` | `/api/notes` | `{ title, message }` -> `201` |
+| `PATCH` | `/api/notes/:id` | `{ title?, message? }` merges into the note -> `200`; an omitted field keeps its stored value, a missing id is a `404` |
 | `DELETE` | `/api/notes/:id` | deletes one note |
 
 Bad input is a `400` (malformed JSON, a non-numeric note id), a body over 8 KB

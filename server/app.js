@@ -272,6 +272,23 @@ async function deleteNote(req, res, id) {
   sendJson(res, 200, { ok: true });
 }
 
+// PATCH merges: fields the client omits keep their stored values, so the
+// composer can send just what the user typed. Length caps match createNote.
+async function editNote(req, res, id) {
+  const user = bearer(req);
+  if (!user) return sendText(res, 401, 'Login required');
+  if (!/^\d+$/.test(id)) return sendText(res, 400, 'Note id must be a number');
+  return parseBody(req, res).then((body) => {
+    const hasTitle = body.title !== undefined && body.title !== null;
+    const hasMessage = body.message !== undefined && body.message !== null;
+    if (!hasTitle && !hasMessage) return sendText(res, 400, 'Give a title or a message to update');
+    const title = hasTitle ? String(body.title).trim().slice(0, 200) : undefined;
+    const message = hasMessage ? String(body.message).trim().slice(0, 4000) : undefined;
+    if (!db.updateNote(user.id, Number(id), title, message)) return sendText(res, 404, 'No such note');
+    sendJson(res, 200, { ok: true });
+  });
+}
+
 // One lookup instead of six comparisons per request; the delete route is the
 // only one that carries a path parameter, so it stays a prefix check.
 const ENDPOINTS = {
@@ -286,6 +303,7 @@ function api(method, pathname, req, res) {
   const handler = ENDPOINTS[`${method} ${pathname}`];
   if (handler) return handler(req, res);
   if (method === 'DELETE' && pathname.startsWith('/api/notes/')) return deleteNote(req, res, pathname.slice(11));
+  if (method === 'PATCH' && pathname.startsWith('/api/notes/')) return editNote(req, res, pathname.slice(11));
   return null;
 }
 

@@ -49,7 +49,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --paper: #0c0f14;
     --surface: #12171e;
     --surface-2: #171d26;
@@ -63,6 +63,23 @@
     --shadow-1: 0 1px 2px rgba(0, 0, 0, .4), 0 2px 8px rgba(0, 0, 0, .35);
     --shadow-2: 0 2px 4px rgba(0, 0, 0, .5), 0 10px 20px rgba(0, 0, 0, .45);
   }
+}
+
+/* an explicit choice on <html data-theme="..."> wins over the media query,
+   whatever the operating system prefers; the theme chip in app.js sets it */
+:root[data-theme="dark"] {
+  --paper: #0c0f14;
+  --surface: #12171e;
+  --surface-2: #171d26;
+  --line: #252c38;
+  --ink: #e7ebf2;
+  --ink-soft: #a9b2c1;
+  --ink-faint: #8892a4;
+  --accent: #6d9eff;
+  --accent-ink: #0a111d;
+  --danger: #f09a90;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .4), 0 2px 8px rgba(0, 0, 0, .35);
+  --shadow-2: 0 2px 4px rgba(0, 0, 0, .5), 0 10px 20px rgba(0, 0, 0, .45);
 }
 
 *,
@@ -282,7 +299,8 @@ textarea {
 
 /* ---------------------------- join card ---------------------------- */
 
-#auth-form {
+#auth-login,
+#auth-register {
   display: grid;
   align-content: start;
   gap: var(--s-4);
@@ -292,6 +310,10 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
+}
+
+#auth-register {
+  margin-top: var(--s-3);
 }
 
 .lede {
@@ -420,6 +442,37 @@ time {
   border-color: var(--danger);
 }
 
+/* an armed card waits for a second confirming click: the outline and the
+   recoloured chip say "one more click to actually delete" */
+.remove-note.armed {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+.note.armed {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 2px var(--danger-soft);
+}
+
+/* the filters row sits under the status chip: search field plus the search
+   and sort chips, one wrapped flex line, centred like the other rows */
+.filters {
+  justify-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  max-width: 34rem;
+}
+
+.field-search {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
 .remove-note:focus-visible {
   outline: 2px solid var(--danger);
   outline-offset: 2px;
@@ -499,7 +552,8 @@ time {
   }
 
   .composer,
-  #auth-form {
+  #auth-login,
+  #auth-register {
     max-width: 100%;
   }
 
