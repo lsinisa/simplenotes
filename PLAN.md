@@ -23,28 +23,47 @@ Status markers: [ ] todo  [x] done and smoke-checked
 
 ## Tranche 2 - riskier / bigger (assess after tranche 1 is verified live)
 
-- [ ] 3. Edit-in-place: PATCH /api/notes/:id endpoint + clicking a note card
-      swaps it into the composer ("editing mode"). Only tranche-2 item that
-      touches server/app.js, db.js and the endpoint table.
-- [ ] 6. Manual theme toggle: data-theme attribute + duplicate token block in
-      CSS; small button in topbar.
-- [ ] 7. Delete undo: first delete fires, status chip offers "undo" which
-      re-posts the note. Alternative was two-step arm/confirm; undo chosen.
-- [ ] 8. Status chip sits below #app at page bottom - relocate under the
-      composer so confirmations are visible without scrolling.
-- [ ] 9. Sort control chip (newest/oldest/A-Z), client-side sort before map().
-- [ ] 10. Search box, client-side filter of title+message, count chip reflects
-      filtered count. Only sane while /api/notes stays unpaged.
-- [ ] 4b. Full form split: login form drops the name field entirely; needs a
-      small state change in guest flow (intent before submit).
+- [x] 3. Edit-in-place: PATCH /api/notes/:id (server/app.js + db.js merge,
+      prepared updateNote statement) + an explicit `edit` chip per card that
+      loads the note into the composer; save then PATCHes, age preserved.
+- [x] 6. Manual theme chip in topbar: cycles auto/light/dark, sets data-theme
+      on <html>, remembered via localStorage; CSS restates the dark token
+      block under :root[data-theme="dark"] (wins over the media query, which
+      now only applies to :root:not([data-theme="light"])).
+- [x] 7. Two-step delete (arm on first click - red outline + "confirm delete",
+      second click on the same card posts DELETE; arming another card
+      re-arms that one). DEVIATION: plan said undo; arm/confirm chosen
+      because undo re-POSTs a copy and silently loses the note's age.
+- [x] 8. Status chip moved inside the rendered page, directly under the
+      composer; templates draw it from store state, status() updates it in
+      place so an auth error never repaints (which would wipe typed values).
+- [x] 9. Sort chip cycles newest/oldest/A-Z client-side before map().
+- [x] 10. Search field + chip; filter of title+message client-side, count
+      chip shows "N of M match".
+- [x] 4b. Guest form split into two cards by intent (log-in card has no
+      name field; register card adds it).
 
 ## Verification trail
 
-- `node --check public/app.js` after each client edit
-- `node server/app.js` + `node test/smoke.mjs` (server untouched in tranche 1,
-  but re-run confirms the API and static serving still line up)
-- live browser pass: register -> composer -> save button -> note card
+- `node --check public/app.js` after each client edit; `node --check` on
+  server/db.js/server/app.js after the PATCH work
+- smoke test extended with two PATCH assertions (accepted + merge keeps the
+  untouched field) - `node test/smoke.mjs` against a fresh boot: ALL CHECKS
+  PASSED
+- live browser pass (:3130): register -> two saves -> edit chip (composer
+  opens with the note's text, save label "update") -> PATCH updated in place,
+  card count unchanged -> delete armed (red card, "confirm delete") ->
+  confirmed, note gone -> sort chip -> oldest -> search "beta" filtered ->
+  cleared -> theme chip set data-theme=light and --paper flipped to #fafafc
+- one real bug caught live: dataset.id arrives as a string, so store.armed/
+  editing comparisons against numeric note ids missed; coerced with Number()
+  at the delegated-click dispatch
 
 ## Done so far
 
-- 2026-11-02 tranche 1 implemented, committed (see git log)
+- 2026-11-02 tranche 1 implemented, committed (8437d50)
+- 2026-11-02 tranche 2 implemented, committed (82cf58a); four commits now sit
+  unpushed on top of origin - push pending user review
+- note: old server instances still hold ports 3000/3100/3120 with stale
+  cached assets; static files are read once at boot, so a restart is needed
+  after any public/ edit
