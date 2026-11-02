@@ -146,6 +146,7 @@ function loadNotes() {
   return api('GET', '/api/notes').then((result) => {
     const [, data] = result;
     store.notes = data.notes || [];
+    status('');
     return paint();
   });
 }

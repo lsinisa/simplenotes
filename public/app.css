@@ -20,26 +20,26 @@
   --s-6: 2.25rem;
   --s-7: 3rem;
 
-  /* shape */
-  --radius-sm: .375rem;
-  --radius-md: .75rem;
-  --radius-lg: 1rem;
+  /* shape - flat and minimal: tighter radii, whisper-thin shadows */
+  --radius-sm: .3rem;
+  --radius-md: .5rem;
+  --radius-lg: .75rem;
   --radius-pill: 999px;
-  --shadow-1: 0 1px 2px rgba(15, 23, 20, .06), 0 3px 10px rgba(15, 23, 20, .05);
-  --shadow-2: 0 2px 4px rgba(15, 23, 20, .09), 0 12px 26px rgba(15, 23, 20, .08);
+  --shadow-1: 0 1px 2px rgba(23, 26, 31, .05), 0 2px 8px rgba(23, 26, 31, .04);
+  --shadow-2: 0 2px 4px rgba(23, 26, 31, .07), 0 10px 20px rgba(23, 26, 31, .05);
   --motion: 150ms;
 
-  /* light theme - the accent green is pulled from the logo mark */
-  --paper: #f4f6f3;
+  /* light theme - slate neutrals, one blue accent, no greens */
+  --paper: #fafafc;
   --surface: #ffffff;
-  --surface-2: #ecefec;
-  --line: #d6dcd6;
-  --ink: #16201b;
-  --ink-soft: #49594e;
-  --ink-faint: #506056;
-  --accent: #0b7a3a;
+  --surface-2: #f2f5f9;
+  --line: #e3e8ef;
+  --ink: #10161f;
+  --ink-soft: #4a5563;
+  --ink-faint: #64707e;
+  --accent: #2563eb;
   --accent-ink: #ffffff;
-  --danger: #a02a2c;
+  --danger: #b91c1c;
 
   /* tints and the stronger rule are mixed out of the tokens above, so a theme
      only has to state the base colours */
@@ -50,18 +50,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #101512;
-    --surface: #171e1a;
-    --surface-2: #1e2621;
-    --line: #2b352e;
-    --ink: #e7ece7;
-    --ink-soft: #aebbb1;
-    --ink-faint: #94a298;
-    --accent: #4ed489;
-    --accent-ink: #071409;
-    --danger: #ef8b88;
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, .5), 0 4px 12px rgba(0, 0, 0, .4);
-    --shadow-2: 0 2px 5px rgba(0, 0, 0, .55), 0 14px 28px rgba(0, 0, 0, .45);
+    --paper: #0c0f14;
+    --surface: #12171e;
+    --surface-2: #171d26;
+    --line: #252c38;
+    --ink: #e7ebf2;
+    --ink-soft: #a9b2c1;
+    --ink-faint: #8892a4;
+    --accent: #6d9eff;
+    --accent-ink: #0a111d;
+    --danger: #f09a90;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, .4), 0 2px 8px rgba(0, 0, 0, .35);
+    --shadow-2: 0 2px 4px rgba(0, 0, 0, .5), 0 10px 20px rgba(0, 0, 0, .45);
   }
 }
 
@@ -83,9 +83,6 @@ body {
   line-height: 1.55;
   color: var(--ink);
   background: var(--paper);
-  background-image: radial-gradient(110% 55% at 50% -8%, var(--accent-soft), transparent 62%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -155,7 +152,7 @@ h1 {
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   min-height: 2.1rem;
   padding: var(--s-1) var(--s-4);
   cursor: pointer;
@@ -164,10 +161,8 @@ h1 {
 }
 
 .link:hover {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--accent-soft);
   border-color: var(--accent);
-  box-shadow: var(--shadow-1);
 }
 
 .link:active {
@@ -353,14 +348,12 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-1);
-  transition: box-shadow var(--motion) ease, transform var(--motion) ease,
-    border-color var(--motion) ease;
+  transition: box-shadow var(--motion) ease, border-color var(--motion) ease;
 }
 
 .note:hover {
   box-shadow: var(--shadow-2);
   border-color: var(--line-strong);
-  transform: translateY(-2px);
 }
 
 .note-head {
@@ -412,7 +405,7 @@ time {
   color: var(--ink-faint);
   background: transparent;
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   min-height: 1.8rem;
   padding: var(--s-1) var(--s-3);
   margin-left: auto;
@@ -521,10 +514,6 @@ time {
   * {
     transition-duration: 1ms !important;
     animation-duration: 1ms !important;
-  }
-
-  .note:hover {
-    transform: none;
   }
 }
 

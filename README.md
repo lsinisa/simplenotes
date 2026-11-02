@@ -34,8 +34,12 @@ one place:
   grid of note cards that reflows down to one column on phones
 - note cards show their age (`just now`, `12m`, `3h`, `2d`) and an explicit
   delete button instead of a floating `x`
-- keyboard first: `enter` while typing saves the note, `enter` on a focused
-  button activates that button
+- keyboard first: `enter` on a composer field saves the note, `esc` throws the
+  draft away, `enter` on a focused button activates that button
+- the `saving...` chip clears itself on every repaint once the round-trip
+  finishes, so no toast lingers after a save
+- palette is restrained slate neutrals + one blue accent; flat paper, whisper-thin
+  shadows, rounded-rect controls (chips stay pill-shaped)
 - `prefers-reduced-motion` turns the hover transitions off
 
 ## Running
