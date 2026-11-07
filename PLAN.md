@@ -92,6 +92,55 @@ Plan:
   gridTemplateColumns of #app, status height 0 -> composer height unchanged
   when empty), plus one screenshot handed to the user for their own eyes.
 
+## Tranche 5 - de-dating pass (what looks 2010s and why)
+
+Diagnosis against the shipped stylesheet (:3160 build):
+- EVERY affordance sits in a bordered, shadowed card: composer card, join
+  card, each note card all carry border + box-shadow + surface fill. A page
+  of boxes is the signature of card-era UI; modern minimal is flat paper
+  with hairline separations
+- hover raises a shadow (shadow-1 -> shadow-2) plus border-strong: shadow
+  lift is skeuomorphic-era behaviour
+- every chip/button has a permanent 1px border: hundreds of tiny outlined
+  pills read as button chrome; modern controls are borderless text until
+  touched
+- textarea/input fields are filled rounded boxes with borders: form chrome
+  look; modern is a label + underline affordance
+- mono timestamp inside the header row still fine, but the whole header
+  row feels boxed while inside a bordered card
+- two-pane layout itself is fine (not the problem) - the problem is the
+  treatment inside it
+
+Plan:
+- [ ] 26. Notes become rows on paper, not cards: no border, no shadow,
+        transparent fill; a hairline border-top on every note after the
+        first separates the feed; hover tints the row one step (surface-2)
+        instead of lifting a shadow
+- [ ] 27. Composer and join card lose their frame: flat on paper with a
+        single hairline above the region; note-title/hint keep typographic
+        hierarchy for separation
+- [ ] 28. Fields restyled as underline inputs: transparent fill, no border
+        except a 2px --line-strong bottom rule; radius gone from fields
+- [ ] 29. Chips become text buttons: no border, no background; ink-faint
+        text, hover = ink + surface-2 rounded underlay, active states
+        (armed danger, ok accent) keep colour without borders; focus-visible
+        keeps the accent outline for keyboard users
+- [ ] 30. Shadows deleted everywhere except the logo (kept as a brand
+        anchor); the two shadow tokens stay defined so future surfaces can
+        use them
+- [ ] 31. Radii lowered one step across controls/cards (--radius-sm .35rem
+        for anything rounded that remains)
+- [ ] 32. Type pass: wordmark weight 700 -> tracking -.01em stays; note
+        title 1.05rem/600; body .98rem line-height 1.6; count/status copy
+        .8rem ink-soft
+- [ ] 33. Status chip keeps its pill ONLY when non-empty (it is a live
+        message, borders-in-modern-era means "state"): armed/danger variants
+        get tinted surface + danger text, no border
+- verification: computed-style asserts (note card borderTopWidth 0 for all
+  but first / borderTopColor line for rest; chip borders 0px; field borders
+  only bottom; shadow only on logo) + geometry unchanged (two panes, single
+  column) + one screenshot handed over
+
 ## Verification trail
 
 - `node --check public/app.js` after each client edit; `node --check` on
