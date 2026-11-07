@@ -46,10 +46,12 @@ one place:
 - keyboard first: `enter` on a composer field saves the note, `esc` throws the
   draft away (or cancels an open edit), `enter` on a focused button activates
   that button
-- the status chip sits just under the composer and clears itself on every
+- the status chip is the composer card's last row and clears itself on every
   repaint once the round-trip finishes, so no toast lingers after a save
-- palette is restrained slate neutrals + one blue accent; flat paper, whisper-thin
-  shadows, rounded-rect controls (chips stay pill-shaped)
+- palette is restrained slate neutrals + one blue accent; flat paper with hairline
+  separations, no card frames and no shadows (the logo is the only shadowed thing),
+  borderless text controls that paint a soft underlay when touched, underline-style
+  fields, the pill shape reserved for the live status message
 - `prefers-reduced-motion` turns the hover transitions off
 
 ## Running

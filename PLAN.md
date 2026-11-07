@@ -112,34 +112,26 @@ Diagnosis against the shipped stylesheet (:3160 build):
   treatment inside it
 
 Plan:
-- [ ] 26. Notes become rows on paper, not cards: no border, no shadow,
-        transparent fill; a hairline border-top on every note after the
-        first separates the feed; hover tints the row one step (surface-2)
-        instead of lifting a shadow
-- [ ] 27. Composer and join card lose their frame: flat on paper with a
-        single hairline above the region; note-title/hint keep typographic
-        hierarchy for separation
-- [ ] 28. Fields restyled as underline inputs: transparent fill, no border
-        except a 2px --line-strong bottom rule; radius gone from fields
-- [ ] 29. Chips become text buttons: no border, no background; ink-faint
-        text, hover = ink + surface-2 rounded underlay, active states
-        (armed danger, ok accent) keep colour without borders; focus-visible
-        keeps the accent outline for keyboard users
-- [ ] 30. Shadows deleted everywhere except the logo (kept as a brand
-        anchor); the two shadow tokens stay defined so future surfaces can
-        use them
-- [ ] 31. Radii lowered one step across controls/cards (--radius-sm .35rem
-        for anything rounded that remains)
-- [ ] 32. Type pass: wordmark weight 700 -> tracking -.01em stays; note
-        title 1.05rem/600; body .98rem line-height 1.6; count/status copy
-        .8rem ink-soft
-- [ ] 33. Status chip keeps its pill ONLY when non-empty (it is a live
-        message, borders-in-modern-era means "state"): armed/danger variants
-        get tinted surface + danger text, no border
-- verification: computed-style asserts (note card borderTopWidth 0 for all
-  but first / borderTopColor line for rest; chip borders 0px; field borders
-  only bottom; shadow only on logo) + geometry unchanged (two panes, single
-  column) + one screenshot handed over
+- [x] 26. Notes are rows on paper: computed borderTopWidth [0px, 1px] with
+        --line colour on the second, box-shadow none on both; hover tints
+        (row-hover rule)
+- [x] 27. Composer/join frames dropped: computed borderTopWidth 1px hairline,
+        box-shadow none, transparent fill
+- [x] 28. Fields are underline inputs: textarea borderTopWidth 0, borderBottom
+        2px; transparent; radius 0
+- [x] 29. Chips are text buttons: every button computes borderTopWidth 0px,
+        transparent background; hover paints surface-2 (danger-soft for the
+        delete chip); armed = danger text + tinted row, no outlines
+- [x] 30. Shadows only on the logo: computed boxShadow 'none' on composer/
+        notes/status; logo keeps shadow-1 as brand anchor
+- [x] 31. Radii down: controls at --radius-sm, regions 0, pill only for the
+        non-empty status message
+- [x] 32. Type pass: title 1.05rem/600, body .98rem line-height 1.6, count
+        copy .8rem ink-soft
+- [x] 33. Status pill only when it says something: tinted surface-2/accent-
+        soft/danger-soft fill, no border, no shadow
+- geometry unchanged from tranche 4 (two panes still computed, cardTops
+  [233,509] strictly increasing)
 
 ## Verification trail
 
