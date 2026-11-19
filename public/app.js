@@ -211,7 +211,9 @@ function editorHtml() {
   const total = store.notes.length;
   let summary;
   if (store.query) {
-    summary = `<p class="count">${count} of ${total} note${total === 1 ? '' : 's'} match${store.query ? ` "${store.query}"` : ''}</p>`;
+    // search chips can hold arbitrary text; the summary draws it as DATA,
+    // so the echo goes through esc() or a query like <b>x injects markup
+    summary = `<p class="count">${count} of ${total} note${total === 1 ? '' : 's'} match${store.query ? ` "${esc(store.query)}"` : ''}</p>`;
   } else if (count === 0) {
     summary = '<p class="empty">no notes yet - write a title and a message, then press enter to save.</p>';
   } else {
@@ -256,8 +258,15 @@ function paint() {
 
 function loadNotes() {
   return api('GET', '/api/notes').then((result) => {
-    const [, data] = result;
-    store.notes = data.notes || [];
+    const [code, data] = result;
+    // a failed reload must not replace the list with []: every save/edit
+    // ends here, and one unreachable-server answer would silently drop the
+    // whole list the user is looking at. keep the last good one and say so.
+    if (code !== 200 || !data || !Array.isArray(data.notes)) {
+      const reason = data && data.error ? String(data.error) : 'unexpected response';
+      return status(`notes could not be reloaded (${reason}) - the list shown is still the last one that loaded`, 'error');
+    }
+    store.notes = data.notes;
     status('');
     return paint();
   });
@@ -286,9 +295,16 @@ function boot() {
       store.mode = 'editor';
       return loadNotes();
     }
+    // an unreachable server is not an expired session: wiping the token on
+    // a transient failure makes the user re-register to find their notes
+    // "gone". keep the token; the next boot retries.
+    if (code === 0) {
+      status('the server could not be reached, your session was kept - try again', 'error');
+      return paint();
+    }
     store.token = '';
     localStorage.removeItem('token');
-    status('your session expired, please register again', 'error');
+    status('login required - session expired, please register again', 'error');
     return paint();
   });
 }

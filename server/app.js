@@ -78,7 +78,10 @@ function verifyToken(token) {
   // The id goes straight into a sqlite parameter, so it has to be a real
   // integer before anything else is trusted about the payload.
   if (!payload || !Number.isSafeInteger(payload.id)) return null;
-  if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+  // signToken always stamps exp; a payload without a usable one is not ours
+  // and must not be treated as an unlimited-life token.
+  if (!Number.isSafeInteger(payload.exp)) return null;
+  if (payload.exp < Math.floor(Date.now() / 1000)) return null;
   return payload;
 }
 
@@ -130,6 +133,9 @@ for (const entry of walk(config.publicDir, '')) {
 
 /* ---------------------------- responses ---------------------------- */
 function sendJson(res, status, value) {
+  // one answer per response: the 413 path already wrote when it tripped the
+  // body limit, and a handler that keeps running must not append a second.
+  if (res.writableEnded) return;
   const body = Buffer.from(JSON.stringify(value));
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -145,6 +151,7 @@ function sendText(res, status, message) {
 }
 
 function notFound(res) {
+  if (res.writableEnded) return;
   res.statusCode = 404;
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -175,6 +182,9 @@ function readBody(req, res) {
       total += chunk.length;
       if (total > config.maxBodyBytes) {
         sendText(res, 413, 'Request body too large');
+        // the promise has to resolve too - a dangling one keeps the handler
+        // (and its request buffers) alive until the socket goes away.
+        resolve(null);
         req.destroy();
         return;
       }
@@ -189,6 +199,13 @@ function readBody(req, res) {
 // on the error so the route handler answers 400 instead of a generic 500.
 function parseBody(req, res) {
   return readBody(req, res).then((buffer) => {
+    // null is the 413 abort: the response is already written, so stop here
+    // rather than parsing whatever partial bytes made it under the limit.
+    if (buffer === null) {
+      const bad = new Error('Request body too large');
+      bad.status = 413;
+      throw bad;
+    }
     if (!buffer.length) return {};
     let parsed;
     try {

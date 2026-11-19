@@ -133,6 +133,35 @@ Plan:
 - geometry unchanged from tranche 4 (two panes still computed, cardTops
   [233,509] strictly increasing)
 
+## Tranche 6 - robustness pass (found by reading the code, not the UI)
+
+- 34. **the search echo is unescaped html** - the summary line interpolates
+  store.query raw into innerHTML; a search box containing <b> injects markup
+  into the page. esc() the echo.
+- 35. **loadNotes failure clears the whole list** - every save/edit ends in
+  loadNotes(), and one transient unreachable-server response replaces the
+  note list with [] - the user reads that as data loss. Keep the previous
+  list and say why the reload failed instead.
+- 36. **boot() treats an unreachable server as an expired session** - a
+  code-0 response falls into the token-wipe branch, destroying the identity
+  on a transient glitch. Keep the token on code 0; chip the reason only.
+- 37. **the 413 early abort leaves the handler promise dangling** and a
+  partial body can still parse into a second sendText on an ended response.
+  readBody resolves null at the abort, parseBody refuses it, and sendJson/
+  notFound become idempotent via res.writableEnded.
+- 38. **verifyToken accepts a payload without exp** - HMAC keeps it honest
+  but the contract should be enforced: exp must be a safe integer.
+- 39. **db.js prepares noteById lazily** while every other query lives in
+  the stmt block - one code path that grows on first touch. Move it in.
+- 40. smoke: a forged signature (valid shape, wrong hmac) must 401.
+
+verified 2026-11-16: node --check clean on all four files; smoke on :3180
+ALL CHECKS PASSED including new 'forged token signature rejected' next to
+the pre-existing 'tampered token rejected'; served app.js from :3180 carries
+all three client guards (reload guard, keep-token boot branch, esc on
+summary echo). the browser tool was unavailable this round, so the client
+guards are syntax-clean and deployed but not click-tested live.
+
 ## Verification trail
 
 - `node --check public/app.js` after each client edit; `node --check` on

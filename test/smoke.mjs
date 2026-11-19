@@ -63,6 +63,11 @@ async function run() {
   const [meStatus, me] = await call('GET', '/api/me', undefined, token);
   expect('me returns the user', meStatus === 200 && me.email === email, `${meStatus} ${JSON.stringify(me)}`);
 
+  // a forged signature - right shape, wrong hmac - must not verify
+  const forged = `${token.slice(0, token.lastIndexOf('.') + 1)}${'A'.repeat(43)}`;
+  const [forgedStatus, forgedBody] = await call('GET', '/api/me', undefined, forged);
+  expect('forged token signature rejected', forgedStatus === 401, `${forgedStatus} ${JSON.stringify(forgedBody)}`);
+
   const [noteStatus, note] = await call('POST', '/api/notes', { title: 'first', message: 'hello' }, token);
   expect('create note accepted', noteStatus === 201, `${noteStatus} ${JSON.stringify(note)}`);
   await call('POST', '/api/notes', { title: 'second', message: 'world' }, token);

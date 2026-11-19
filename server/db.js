@@ -45,6 +45,7 @@ class Db {
       ),
       deleteNote: this.db.prepare('DELETE FROM notes WHERE user_id = :user_id AND id = :id'),
       countNotes: this.db.prepare('SELECT COUNT(id) AS count FROM notes WHERE user_id = :user_id'),
+      noteById: this.db.prepare('SELECT * FROM notes WHERE user_id = :user_id AND id = :id'),
     };
   }
 
@@ -77,13 +78,9 @@ class Db {
   }
 
   // PATCH merges: a missing field keeps the stored value, an empty string
-  // clears it. The row is read through the prepared byId-style lookup for
-  // notes so the handler can 404 before touching it.
+  // clears it. read goes through the same prepared set as every other query.
   selectNote(userId, id) {
-    if (!this.noteById) {
-      this.noteById = this.db.prepare('SELECT * FROM notes WHERE user_id = :user_id AND id = :id');
-    }
-    return this.noteById.get({ user_id: userId, id });
+    return this.stmt.noteById.get({ user_id: userId, id });
   }
 
   updateNote(userId, id, title, message) {
