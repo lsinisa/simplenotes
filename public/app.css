@@ -138,15 +138,15 @@ body {
     row-gap: var(--s-4);
   }
 
-  .topbar {
+  #app[data-mode="editor"] .topbar {
     grid-area: head;
   }
 
-  .feed {
+  #app[data-mode="editor"] .feed {
     grid-area: feed;
   }
 
-  .rail {
+  #app[data-mode="editor"] .rail {
     grid-area: rail;
     justify-self: end;
   }
@@ -178,7 +178,6 @@ body {
 .logo {
   width: 2.25rem;
   height: 2.25rem;
-  margin: 0 var(--s-3) 0 0;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-1);
 }
@@ -271,7 +270,6 @@ textarea:hover {
 input:focus,
 textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 input::placeholder,
@@ -520,6 +518,12 @@ time {
   gap: .4rem;
 }
 
+.field-search input {
+  width: auto;
+  flex: 1 1 4rem;
+  min-width: 4rem;
+}
+
 .remove-note:focus-visible {
   outline: 2px solid var(--danger);
   outline-offset: 2px;
@@ -609,3 +613,13 @@ time {
   }
 }
 
+
+/* two-pane region: toolbar must live on ONE line - chips shrink */
+@media (min-width: 60rem) {
+  .toolbar {
+    flex-wrap: nowrap;
+  }
+  .toolbar button.link {
+    padding: var(--s-2) var(--s-3);
+  }
+}

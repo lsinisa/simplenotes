@@ -178,6 +178,28 @@ guards are syntax-clean and deployed but not click-tested live.
   editing comparisons against numeric note ids missed; coerced with Number()
   at the delegated-click dispatch
 
+## Tranche 7 - visual-impecability audit (2026-11-21)
+
+Goal: not improvement this time - zero visual errors. Every claim checked by
+measuring the live page in headless Chromium over CDP (browser_exec
+unavailable; `--dump-dom` kept failing, the websocket client works).
+
+- [x] grid-area leak: `.topbar`/`.feed`/`.rail` got `grid-area` unscoped at
+      >=60rem, so the guest topbar landed in the `head` area mid-page (y=225)
+      - scoped all three to `#app[data-mode="editor"]`
+- [x] logo double space: `margin: 0 var(--s-3) 0 0` stacked on the topbar flex
+      gap (24px between "simple" and "notes") - margin removed, gap alone 13px
+- [x] double focus ring: `:focus` had outline AND box-shadow ring at once -
+      box-shadow dropped, one crisp 2px outline remains (verified with real
+      Tab-key focus walks; programmatic focus() never hits :focus-visible)
+- [x] toolbar wrapped at two-pane width (feed 472px, chips natural ~558):
+      `flex-wrap: nowrap` + `padding: var(--s-2) var(--s-3)` on toolbar chips
+      inside @media 60rem only; search field shrinks via
+      `flex: 1 1 4rem; min-width: 4rem` - below 60rem chips still flow-wrap
+- [x] verified: guest/editor 1280 light, editor 1280 dark, guest/editor 390 -
+      single toolbar line, scrollW == clientW (no overflow anywhere), exactly
+      one shadow (the logo), status chip 0-tall when empty, tokens flip
+
 ## Done so far
 
 - 2026-11-02 tranche 1 implemented, committed (8437d50)
