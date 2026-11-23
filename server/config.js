@@ -13,7 +13,11 @@ module.exports = {
   dbPath: process.env.DB_PATH || 'data/simplenotes.sqlite',
   publicDir: process.env.PUBLIC_DIR || 'public',
   tokenExpiresIn: Number(process.env.TOKEN_EXPIRES_IN || 24 * 60 * 60),
-  maxBodyBytes: 8 * 1024,
+  // Has to fit the biggest note the API itself accepts: a 200-char title and
+  // 4000-char message are 16,800 bytes of UTF-8 worst case (4-byte chars), plus
+  // JSON overhead. An 8 KiB limit rejected perfectly valid notes (413) if the
+  // text was accented. The cap stays small as the DoS guard.
+  maxBodyBytes: 24 * 1024,
   secret: hasSecret ? process.env.SECRET : crypto.randomBytes(32).toString('hex'),
   generatedSecret: !hasSecret,
 };

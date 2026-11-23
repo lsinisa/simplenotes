@@ -350,7 +350,14 @@ function sendAsset(res, asset, req) {
 }
 
 function route(req, res) {
-  const pathname = new URL(req.url, 'http://127.0.0.1:3000').pathname;
+  let pathname;
+  try {
+    // new URL throws synchronously on inputs like `GET http://` (a scheme with
+    // no host). outside the guard that throw killed the whole process.
+    pathname = new URL(req.url, 'http://127.0.0.1:3000').pathname;
+  } catch (err) {
+    return sendText(res, 400, 'Invalid request URL');
+  }
   try {
     const promise = api(req.method, pathname, req, res);
     if (promise) {

@@ -44,7 +44,7 @@ async function asset(url) {
 async function run() {
   const page = await asset('/');
   expect('serves the app at /', page.status === 200 && page.type.startsWith('text/html'), JSON.stringify(page));
-  expect('app.js is gzipped', page.encoding === 'gzip' || true, '');
+  expect('index page gzipped', page.encoding === 'gzip', JSON.stringify(page));
 
   const js = await asset('/app.js');
   expect('app.js served as javascript', js.status === 200 && js.type.startsWith('text/javascript'), JSON.stringify(js));
